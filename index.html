@@ -1,0 +1,1158 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Topical — Past Paper Question Sorter</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,300;9..144,400;9..144,500;9..144,600;9..144,700&family=JetBrains+Mono:wght@400;500&family=Inter+Tight:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #f6f8fc;
+  --bg-elev: #ffffff;
+  --bg-soft: #eef2f9;
+  --ink: #0a1633;
+  --ink-soft: #475677;
+  --ink-faint: #8693ad;
+  --line: #dde4f0;
+  --line-soft: #e8eef7;
+  --blue: #1d4ed8;
+  --blue-deep: #0b2f9b;
+  --blue-bright: #2563eb;
+  --blue-tint: #e8efff;
+  --blue-glow: rgba(37, 99, 235, 0.18);
+  --accent: #ffd23f;
+  --shadow-sm: 0 1px 2px rgba(11, 47, 155, 0.06);
+  --shadow-md: 0 12px 28px -12px rgba(11, 47, 155, 0.18), 0 4px 10px -4px rgba(11, 47, 155, 0.08);
+  --shadow-lg: 0 30px 60px -20px rgba(11, 47, 155, 0.25);
+  --radius: 14px;
+  --radius-lg: 22px;
+}
+
+[data-theme="dark"] {
+  --bg: #060912;
+  --bg-elev: #0d1322;
+  --bg-soft: #111a2e;
+  --ink: #eef2fb;
+  --ink-soft: #9dabc7;
+  --ink-faint: #5e6c8a;
+  --line: #1c2740;
+  --line-soft: #15203a;
+  --blue: #6691ff;
+  --blue-deep: #4a78ee;
+  --blue-bright: #88aaff;
+  --blue-tint: #142446;
+  --blue-glow: rgba(102, 145, 255, 0.22);
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.3);
+  --shadow-md: 0 12px 28px -12px rgba(0, 0, 0, 0.55), 0 4px 10px -4px rgba(0, 0, 0, 0.3);
+  --shadow-lg: 0 30px 60px -20px rgba(0, 0, 0, 0.6);
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+html { scroll-behavior: smooth; }
+
+body {
+  font-family: 'Inter Tight', -apple-system, BlinkMacSystemFont, sans-serif;
+  background: var(--bg);
+  color: var(--ink);
+  line-height: 1.55;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  transition: background 0.4s ease, color 0.4s ease;
+  overflow-x: hidden;
+}
+
+/* Subtle grid backdrop */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background-image:
+    linear-gradient(var(--line-soft) 1px, transparent 1px),
+    linear-gradient(90deg, var(--line-soft) 1px, transparent 1px);
+  background-size: 56px 56px;
+  background-position: -1px -1px;
+  opacity: 0.45;
+  pointer-events: none;
+  z-index: 0;
+  mask-image: radial-gradient(ellipse at top, black 30%, transparent 75%);
+}
+
+main, header, footer { position: relative; z-index: 1; }
+
+/* ========== TOPBAR ========== */
+.topbar {
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  backdrop-filter: blur(18px) saturate(140%);
+  -webkit-backdrop-filter: blur(18px) saturate(140%);
+  background: color-mix(in srgb, var(--bg) 78%, transparent);
+  border-bottom: 1px solid var(--line);
+}
+
+.topbar-inner {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 14px 32px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-weight: 600;
+  font-size: 17px;
+  letter-spacing: -0.01em;
+  text-decoration: none;
+  color: var(--ink);
+}
+
+.brand-mark {
+  width: 32px;
+  height: 32px;
+  border-radius: 9px;
+  background: linear-gradient(135deg, var(--blue-bright), var(--blue-deep));
+  display: grid;
+  place-items: center;
+  color: white;
+  font-family: 'Fraunces', serif;
+  font-weight: 700;
+  font-size: 17px;
+  font-style: italic;
+  box-shadow: 0 4px 12px var(--blue-glow);
+  position: relative;
+}
+
+.brand-mark::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: linear-gradient(135deg, rgba(255,255,255,0.3), transparent 60%);
+}
+
+.brand small {
+  display: block;
+  font-size: 10px;
+  font-weight: 500;
+  color: var(--ink-faint);
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  margin-top: -2px;
+}
+
+.nav-links {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.nav-links a {
+  padding: 8px 14px;
+  font-size: 14px;
+  color: var(--ink-soft);
+  text-decoration: none;
+  border-radius: 8px;
+  transition: all 0.2s;
+  font-weight: 500;
+}
+
+.nav-links a:hover {
+  color: var(--ink);
+  background: var(--bg-soft);
+}
+
+.topbar-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.theme-toggle {
+  width: 40px;
+  height: 40px;
+  border-radius: 10px;
+  border: 1px solid var(--line);
+  background: var(--bg-elev);
+  color: var(--ink);
+  cursor: pointer;
+  display: grid;
+  place-items: center;
+  transition: all 0.2s;
+}
+
+.theme-toggle:hover {
+  border-color: var(--blue);
+  color: var(--blue);
+  transform: translateY(-1px);
+}
+
+.theme-toggle svg { width: 18px; height: 18px; }
+[data-theme="light"] .theme-toggle .moon { display: block; }
+[data-theme="light"] .theme-toggle .sun { display: none; }
+[data-theme="dark"] .theme-toggle .moon { display: none; }
+[data-theme="dark"] .theme-toggle .sun { display: block; }
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 18px;
+  border-radius: 10px;
+  font-size: 14px;
+  font-weight: 600;
+  text-decoration: none;
+  cursor: pointer;
+  border: none;
+  transition: all 0.2s;
+  font-family: inherit;
+}
+
+.btn-primary {
+  background: var(--blue);
+  color: white;
+  box-shadow: 0 4px 14px var(--blue-glow);
+}
+
+.btn-primary:hover {
+  background: var(--blue-deep);
+  transform: translateY(-1px);
+  box-shadow: 0 6px 20px var(--blue-glow);
+}
+
+[data-theme="dark"] .btn-primary { color: #050b1c; }
+
+/* ========== HERO ========== */
+.hero {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 80px 32px 40px;
+  position: relative;
+}
+
+.hero-grid {
+  display: grid;
+  grid-template-columns: 1.1fr 1fr;
+  gap: 80px;
+  align-items: center;
+}
+
+.eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 14px;
+  background: var(--blue-tint);
+  color: var(--blue);
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  margin-bottom: 28px;
+  font-family: 'JetBrains Mono', monospace;
+}
+
+.eyebrow .dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--blue);
+  animation: pulse 2s ease infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.5; transform: scale(0.8); }
+}
+
+h1.hero-title {
+  font-family: 'Fraunces', serif;
+  font-weight: 400;
+  font-size: clamp(48px, 6.4vw, 84px);
+  line-height: 0.98;
+  letter-spacing: -0.035em;
+  color: var(--ink);
+  margin-bottom: 28px;
+}
+
+h1.hero-title em {
+  font-style: italic;
+  color: var(--blue);
+  font-weight: 400;
+  position: relative;
+}
+
+h1.hero-title em::after {
+  content: '';
+  position: absolute;
+  left: 0; right: 0;
+  bottom: 4px;
+  height: 10px;
+  background: var(--blue-tint);
+  z-index: -1;
+  border-radius: 2px;
+}
+
+.hero-sub {
+  font-size: 19px;
+  color: var(--ink-soft);
+  margin-bottom: 36px;
+  max-width: 540px;
+  line-height: 1.6;
+}
+
+.hero-cta {
+  display: flex;
+  gap: 14px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.btn-ghost {
+  background: transparent;
+  color: var(--ink);
+  border: 1px solid var(--line);
+}
+
+.btn-ghost:hover {
+  border-color: var(--blue);
+  color: var(--blue);
+}
+
+.hero-stats {
+  display: flex;
+  gap: 36px;
+  margin-top: 56px;
+  padding-top: 32px;
+  border-top: 1px solid var(--line);
+}
+
+.stat strong {
+  display: block;
+  font-family: 'Fraunces', serif;
+  font-size: 32px;
+  font-weight: 500;
+  color: var(--ink);
+  letter-spacing: -0.02em;
+}
+
+.stat span {
+  font-size: 13px;
+  color: var(--ink-faint);
+  font-family: 'JetBrains Mono', monospace;
+  letter-spacing: 0.02em;
+}
+
+/* ========== HERO VISUAL (UPLOAD MOCK) ========== */
+.hero-visual {
+  position: relative;
+}
+
+.upload-card {
+  background: var(--bg-elev);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-lg);
+  padding: 28px;
+  box-shadow: var(--shadow-lg);
+  position: relative;
+  overflow: hidden;
+}
+
+.upload-card::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--blue), transparent);
+}
+
+.uc-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 22px;
+}
+
+.uc-head h3 {
+  font-family: 'Fraunces', serif;
+  font-size: 19px;
+  font-weight: 500;
+  letter-spacing: -0.01em;
+}
+
+.uc-tabs {
+  display: flex;
+  gap: 4px;
+  background: var(--bg-soft);
+  padding: 3px;
+  border-radius: 8px;
+  font-size: 12px;
+}
+
+.uc-tab {
+  padding: 5px 11px;
+  border-radius: 6px;
+  cursor: pointer;
+  color: var(--ink-soft);
+  font-weight: 500;
+  transition: all 0.2s;
+}
+
+.uc-tab.active {
+  background: var(--bg-elev);
+  color: var(--ink);
+  box-shadow: var(--shadow-sm);
+}
+
+.dropzone {
+  border: 2px dashed var(--line);
+  border-radius: var(--radius);
+  padding: 44px 24px;
+  text-align: center;
+  background: var(--bg-soft);
+  position: relative;
+  transition: all 0.3s;
+  cursor: pointer;
+}
+
+.dropzone:hover {
+  border-color: var(--blue);
+  background: var(--blue-tint);
+}
+
+.dropzone-icon {
+  width: 56px;
+  height: 56px;
+  margin: 0 auto 14px;
+  border-radius: 14px;
+  background: var(--bg-elev);
+  border: 1px solid var(--line);
+  display: grid;
+  place-items: center;
+  color: var(--blue);
+  box-shadow: var(--shadow-sm);
+}
+
+.dropzone p {
+  font-size: 15px;
+  font-weight: 500;
+  margin-bottom: 4px;
+}
+
+.dropzone small {
+  font-size: 12px;
+  color: var(--ink-faint);
+  font-family: 'JetBrains Mono', monospace;
+}
+
+.uc-files {
+  margin-top: 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.uc-file {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 11px 14px;
+  background: var(--bg-soft);
+  border-radius: 10px;
+  font-size: 13px;
+  border: 1px solid transparent;
+  transition: all 0.2s;
+}
+
+.uc-file:hover { border-color: var(--line); }
+
+.uc-file-icon {
+  width: 28px;
+  height: 28px;
+  border-radius: 7px;
+  background: var(--blue-tint);
+  color: var(--blue);
+  display: grid;
+  place-items: center;
+  font-size: 10px;
+  font-weight: 700;
+  font-family: 'JetBrains Mono', monospace;
+  flex-shrink: 0;
+}
+
+.uc-file-name { flex: 1; font-weight: 500; }
+.uc-file-size {
+  color: var(--ink-faint);
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+}
+
+.uc-file-status {
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: var(--blue);
+  color: white;
+  display: grid;
+  place-items: center;
+  font-size: 10px;
+}
+
+.uc-action {
+  margin-top: 18px;
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+.btn-sort {
+  flex: 1;
+  background: var(--ink);
+  color: var(--bg);
+  padding: 13px;
+  border-radius: 11px;
+  font-weight: 600;
+  font-size: 14px;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  transition: all 0.2s;
+}
+
+.btn-sort:hover { transform: translateY(-1px); }
+
+.float-tag {
+  position: absolute;
+  background: var(--bg-elev);
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  padding: 10px 14px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 13px;
+  font-weight: 500;
+  box-shadow: var(--shadow-md);
+}
+
+.float-tag-1 {
+  top: -18px;
+  right: -22px;
+  animation: float 6s ease-in-out infinite;
+}
+
+.float-tag-2 {
+  bottom: -22px;
+  left: -28px;
+  animation: float 6s ease-in-out infinite 3s;
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-8px); }
+}
+
+.float-tag .badge {
+  width: 22px; height: 22px;
+  border-radius: 6px;
+  background: var(--blue-tint);
+  color: var(--blue);
+  display: grid;
+  place-items: center;
+  font-size: 11px;
+  font-weight: 700;
+  font-family: 'JetBrains Mono', monospace;
+}
+
+/* ========== SECTION ========== */
+.section {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 100px 32px;
+}
+
+.section-head {
+  margin-bottom: 56px;
+  max-width: 680px;
+}
+
+.section-tag {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 12px;
+  color: var(--blue);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  margin-bottom: 14px;
+}
+
+.section-head h2 {
+  font-family: 'Fraunces', serif;
+  font-size: clamp(34px, 4.4vw, 52px);
+  line-height: 1.05;
+  font-weight: 400;
+  letter-spacing: -0.025em;
+  margin-bottom: 16px;
+}
+
+.section-head h2 em { font-style: italic; color: var(--blue); }
+
+.section-head p {
+  font-size: 17px;
+  color: var(--ink-soft);
+}
+
+/* ========== HOW IT WORKS ========== */
+.steps {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 24px;
+  position: relative;
+}
+
+.step {
+  background: var(--bg-elev);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-lg);
+  padding: 32px;
+  transition: all 0.3s;
+  position: relative;
+  overflow: hidden;
+}
+
+.step:hover {
+  border-color: var(--blue);
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-md);
+}
+
+.step-num {
+  font-family: 'Fraunces', serif;
+  font-size: 56px;
+  font-weight: 300;
+  font-style: italic;
+  color: var(--blue);
+  line-height: 1;
+  margin-bottom: 18px;
+  letter-spacing: -0.04em;
+}
+
+.step h3 {
+  font-family: 'Fraunces', serif;
+  font-size: 22px;
+  font-weight: 500;
+  letter-spacing: -0.015em;
+  margin-bottom: 10px;
+}
+
+.step p {
+  font-size: 14.5px;
+  color: var(--ink-soft);
+  line-height: 1.6;
+}
+
+.step-icon {
+  position: absolute;
+  top: 28px;
+  right: 28px;
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  background: var(--bg-soft);
+  display: grid;
+  place-items: center;
+  color: var(--blue);
+}
+
+/* ========== FEATURES ========== */
+.features {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1px;
+  background: var(--line);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+}
+
+.feature {
+  background: var(--bg-elev);
+  padding: 38px;
+  transition: background 0.2s;
+}
+
+.feature:hover { background: var(--bg-soft); }
+
+.feature-head {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-bottom: 14px;
+}
+
+.feature-icon {
+  width: 42px;
+  height: 42px;
+  border-radius: 11px;
+  background: linear-gradient(135deg, var(--blue-tint), var(--bg-soft));
+  border: 1px solid var(--line);
+  display: grid;
+  place-items: center;
+  color: var(--blue);
+  flex-shrink: 0;
+}
+
+.feature h3 {
+  font-family: 'Fraunces', serif;
+  font-size: 20px;
+  font-weight: 500;
+  letter-spacing: -0.01em;
+}
+
+.feature p {
+  color: var(--ink-soft);
+  font-size: 14.5px;
+  line-height: 1.65;
+}
+
+/* ========== TOPICS PREVIEW ========== */
+.topics-section {
+  background: var(--bg-elev);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-lg);
+  padding: 48px;
+  display: grid;
+  grid-template-columns: 1fr 1.2fr;
+  gap: 56px;
+  align-items: center;
+}
+
+.topics-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 10px;
+}
+
+.topic-chip {
+  background: var(--bg-soft);
+  border: 1px solid var(--line-soft);
+  border-radius: 12px;
+  padding: 14px 16px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 14px;
+  font-weight: 500;
+  transition: all 0.2s;
+  cursor: pointer;
+}
+
+.topic-chip:hover {
+  background: var(--blue-tint);
+  border-color: var(--blue);
+  color: var(--blue);
+  transform: translateX(4px);
+}
+
+.topic-chip-count {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+  color: var(--ink-faint);
+  background: var(--bg-elev);
+  padding: 3px 8px;
+  border-radius: 6px;
+}
+
+.topic-chip:hover .topic-chip-count {
+  color: var(--blue);
+  background: var(--bg-elev);
+}
+
+/* ========== FOOTER ========== */
+.footer {
+  max-width: 1280px;
+  margin: 60px auto 0;
+  padding: 40px 32px;
+  border-top: 1px solid var(--line);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 16px;
+  font-size: 13px;
+  color: var(--ink-faint);
+}
+
+.footer-meta { font-family: 'JetBrains Mono', monospace; font-size: 12px; }
+.footer-links { display: flex; gap: 22px; }
+.footer-links a { color: var(--ink-soft); text-decoration: none; transition: color 0.2s; }
+.footer-links a:hover { color: var(--blue); }
+
+/* Reveal animations */
+.reveal {
+  opacity: 0;
+  transform: translateY(20px);
+  transition: opacity 0.8s ease, transform 0.8s ease;
+}
+.reveal.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* Responsive */
+@media (max-width: 960px) {
+  .hero { padding: 56px 24px 24px; }
+  .hero-grid { grid-template-columns: 1fr; gap: 48px; }
+  .section { padding: 72px 24px; }
+  .steps { grid-template-columns: 1fr; }
+  .features { grid-template-columns: 1fr; }
+  .topics-section { grid-template-columns: 1fr; padding: 32px; gap: 32px; }
+  .topbar-inner { padding: 12px 20px; }
+  .nav-links { display: none; }
+  .hero-stats { gap: 22px; flex-wrap: wrap; }
+  .float-tag-1, .float-tag-2 { display: none; }
+}
+
+@media (max-width: 520px) {
+  .topbar-actions .btn { display: none; }
+  .footer { flex-direction: column; text-align: center; }
+}
+</style>
+</head>
+<body>
+
+<header class="topbar">
+  <div class="topbar-inner">
+    <a href="#" class="brand">
+      <span class="brand-mark">T</span>
+      <span>
+        Topical
+        <small>past paper sorter</small>
+      </span>
+    </a>
+
+    <nav class="nav-links">
+      <a href="#how">How it works</a>
+      <a href="#features">Features</a>
+      <a href="#topics">Topics</a>
+      <a href="#about">About</a>
+    </nav>
+
+    <div class="topbar-actions">
+      <button class="theme-toggle" id="themeToggle" aria-label="Toggle theme">
+        <svg class="moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+        <svg class="sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/></svg>
+      </button>
+      <a href="#sort" class="btn btn-primary">
+        Start sorting
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+      </a>
+    </div>
+  </div>
+</header>
+
+<main>
+
+  <!-- HERO -->
+  <section class="hero">
+    <div class="hero-grid">
+      <div class="hero-copy">
+        <div class="eyebrow">
+          <span class="dot"></span>
+          <span>v1.0 — built for students &amp; teachers</span>
+        </div>
+
+        <h1 class="hero-title">
+          Past papers, <em>sorted</em><br>
+          by topic. In minutes.
+        </h1>
+
+        <p class="hero-sub">
+          Drop in a stack of exam papers and mark schemes. We split, classify, and stitch them back into clean topical PDFs — ready for targeted practice or focused revision sets.
+        </p>
+
+        <div class="hero-cta">
+          <a href="#sort" class="btn btn-primary">
+            Upload papers
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M17 8l-5-5-5 5M12 3v12"/></svg>
+          </a>
+          <a href="#how" class="btn btn-ghost">See how it works</a>
+        </div>
+
+        <div class="hero-stats">
+          <div class="stat">
+            <strong>~2 min</strong>
+            <span>avg sort time</span>
+          </div>
+          <div class="stat">
+            <strong>100</strong>
+            <span>files per batch</span>
+          </div>
+          <div class="stat">
+            <strong>2 PDFs</strong>
+            <span>questions + answers</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="hero-visual">
+        <div class="float-tag float-tag-1">
+          <span class="badge">QP</span>
+          <span>Question paper</span>
+        </div>
+
+        <div class="upload-card" id="sort">
+          <div class="uc-head">
+            <h3>New batch</h3>
+            <div class="uc-tabs">
+              <div class="uc-tab active">Papers</div>
+              <div class="uc-tab">Mark schemes</div>
+            </div>
+          </div>
+
+          <label class="dropzone" for="fileInput">
+            <div class="dropzone-icon">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M17 8l-5-5-5 5M12 3v12"/></svg>
+            </div>
+            <p>Drop PDFs or .zip files here</p>
+            <small>or click to browse — up to 100 files</small>
+            <input type="file" id="fileInput" multiple style="display:none" accept=".pdf,.zip">
+          </label>
+
+          <div class="uc-files">
+            <div class="uc-file">
+              <span class="uc-file-icon">PDF</span>
+              <span class="uc-file-name">9701_w23_qp_42.pdf</span>
+              <span class="uc-file-size">1.2 MB</span>
+              <span class="uc-file-status">
+                <svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+              </span>
+            </div>
+            <div class="uc-file">
+              <span class="uc-file-icon">PDF</span>
+              <span class="uc-file-name">9701_s23_qp_41.pdf</span>
+              <span class="uc-file-size">1.4 MB</span>
+              <span class="uc-file-status">
+                <svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+              </span>
+            </div>
+            <div class="uc-file">
+              <span class="uc-file-icon">ZIP</span>
+              <span class="uc-file-name">chemistry_2018_2022.zip</span>
+              <span class="uc-file-size">24.6 MB</span>
+              <span class="uc-file-status">
+                <svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+              </span>
+            </div>
+          </div>
+
+          <div class="uc-action">
+            <button class="btn-sort">
+              Sort into topics
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+            </button>
+          </div>
+        </div>
+
+        <div class="float-tag float-tag-2">
+          <span class="badge">MS</span>
+          <span>Mark scheme</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- HOW IT WORKS -->
+  <section class="section" id="how">
+    <div class="section-head reveal">
+      <div class="section-tag">// how it works</div>
+      <h2>Three steps from <em>messy stack</em> to clean topical sets.</h2>
+      <p>No accounts, no manual tagging. Just upload, wait, download.</p>
+    </div>
+
+    <div class="steps">
+      <div class="step reveal">
+        <div class="step-icon">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M17 8l-5-5-5 5M12 3v12"/></svg>
+        </div>
+        <div class="step-num">01</div>
+        <h3>Upload your stack</h3>
+        <p>Drop in past paper PDFs and (optionally) their mark schemes. Bulk uploads via .zip work too — up to 100 files at once.</p>
+      </div>
+
+      <div class="step reveal">
+        <div class="step-icon">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+        </div>
+        <div class="step-num">02</div>
+        <h3>We classify each question</h3>
+        <p>Every question is parsed and tagged by topic. Optionally narrow down to a single topic — useful if you only need atomic structure or kinematics today.</p>
+      </div>
+
+      <div class="step reveal">
+        <div class="step-icon">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="12" y1="18" x2="12" y2="12"/><line x1="9" y1="15" x2="15" y2="15"/></svg>
+        </div>
+        <div class="step-num">03</div>
+        <h3>Download two PDFs</h3>
+        <p>One file with topical questions, another with the matching mark schemes. Properly formatted, faithful to the source, ready to print or share.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- FEATURES -->
+  <section class="section" id="features">
+    <div class="section-head reveal">
+      <div class="section-tag">// what's inside</div>
+      <h2>Built like the tools you <em>actually use</em>.</h2>
+      <p>Same friction-free feel as a background remover or audio converter — just pointed at your past paper backlog.</p>
+    </div>
+
+    <div class="features reveal">
+      <div class="feature">
+        <div class="feature-head">
+          <div class="feature-icon">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg>
+          </div>
+          <h3>Bulk &amp; .zip uploads</h3>
+        </div>
+        <p>Two clearly separated lanes — papers on one side, mark schemes on the other. Compressed archives are unpacked automatically.</p>
+      </div>
+
+      <div class="feature">
+        <div class="feature-head">
+          <div class="feature-icon">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+          </div>
+          <h3>Topic-perfect grouping</h3>
+        </div>
+        <p>Questions are sorted into clean topical buckets so students can drill the exact area they're weakest on, instead of grinding entire papers.</p>
+      </div>
+
+      <div class="feature">
+        <div class="feature-head">
+          <div class="feature-icon">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+          </div>
+          <h3>Results in under five minutes</h3>
+        </div>
+        <p>Most batches finish in two. Larger ones get a live progress bar so you know exactly how much longer there is to wait.</p>
+      </div>
+
+      <div class="feature">
+        <div class="feature-head">
+          <div class="feature-icon">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+          </div>
+          <h3>Faithful to the source</h3>
+        </div>
+        <p>Question formatting, figures, and numbering are preserved. What you upload is what you get back — just resorted by topic.</p>
+      </div>
+
+      <div class="feature">
+        <div class="feature-head">
+          <div class="feature-icon">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 7h-7m0 0V0m0 7L4 19m0 0v-7m0 7h7"/><path d="M3 3h7v7H3z"/></svg>
+          </div>
+          <h3>Pick one topic — or all</h3>
+        </div>
+        <p>Just want kinematics? Filter to a single topic and skip everything else. Useful for last-minute targeted revision sets.</p>
+      </div>
+
+      <div class="feature">
+        <div class="feature-head">
+          <div class="feature-icon">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
+          </div>
+          <h3>Works on any device</h3>
+        </div>
+        <p>Designed mobile-first. Sort papers from a school computer, a phone on the bus, or a tablet at the kitchen table.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- TOPICS -->
+  <section class="section" id="topics">
+    <div class="topics-section reveal">
+      <div>
+        <div class="section-tag">// example output</div>
+        <h2 style="font-family:'Fraunces',serif;font-size:38px;font-weight:400;letter-spacing:-0.02em;line-height:1.05;margin-bottom:14px;">A peek at a sorted <em style="font-style:italic;color:var(--blue)">A-Level Chemistry</em> batch.</h2>
+        <p style="color:var(--ink-soft);font-size:16px;margin-bottom:24px;">From 12 uploaded papers — questions automatically grouped into 8 topical clusters with mark scheme counterparts.</p>
+        <a href="#sort" class="btn btn-primary">Try it with your own papers</a>
+      </div>
+
+      <div class="topics-grid">
+        <div class="topic-chip"><span>Atomic structure</span><span class="topic-chip-count">14</span></div>
+        <div class="topic-chip"><span>Bonding</span><span class="topic-chip-count">11</span></div>
+        <div class="topic-chip"><span>Energetics</span><span class="topic-chip-count">9</span></div>
+        <div class="topic-chip"><span>Kinetics</span><span class="topic-chip-count">7</span></div>
+        <div class="topic-chip"><span>Equilibria</span><span class="topic-chip-count">12</span></div>
+        <div class="topic-chip"><span>Redox</span><span class="topic-chip-count">8</span></div>
+        <div class="topic-chip"><span>Organic — alkanes</span><span class="topic-chip-count">10</span></div>
+        <div class="topic-chip"><span>Organic — alcohols</span><span class="topic-chip-count">6</span></div>
+      </div>
+    </div>
+  </section>
+
+  <footer class="footer" id="about">
+    <div class="footer-meta">
+      Topical · v1.0 · built by Danish &amp; Jihoon
+    </div>
+    <div class="footer-links">
+      <a href="#">Privacy</a>
+      <a href="#">Copyright notice</a>
+      <a href="#">Feedback</a>
+    </div>
+  </footer>
+</main>
+
+<script>
+  // Theme toggle
+  const themeToggle = document.getElementById('themeToggle');
+  const root = document.documentElement;
+
+  // Load saved preference if available (in-memory only since localStorage isn't available in artifacts)
+  themeToggle.addEventListener('click', () => {
+    const current = root.getAttribute('data-theme');
+    root.setAttribute('data-theme', current === 'light' ? 'dark' : 'light');
+  });
+
+  // File input feedback
+  const fileInput = document.getElementById('fileInput');
+  if (fileInput) {
+    fileInput.addEventListener('change', (e) => {
+      console.log('Files selected:', e.target.files.length);
+    });
+  }
+
+  // Tab switching in upload card
+  document.querySelectorAll('.uc-tab').forEach(tab => {
+    tab.addEventListener('click', (e) => {
+      document.querySelectorAll('.uc-tab').forEach(t => t.classList.remove('active'));
+      e.target.classList.add('active');
+    });
+  });
+
+  // Reveal on scroll
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        entry.target.classList.add('visible');
+      }
+    });
+  }, { threshold: 0.12 });
+
+  document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+</script>
+
+</body>
+</html>
