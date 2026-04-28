@@ -353,16 +353,20 @@ h1.hero-title em::after {
 /* ========== HERO VISUAL (UPLOAD MOCK) ========== */
 .hero-visual {
   position: relative;
+  width: 100%;
+  min-width: 0;
 }
 
 .upload-card {
   background: var(--bg-elev);
   border: 1px solid var(--line);
   border-radius: var(--radius-lg);
-  padding: 28px;
+  padding: clamp(20px, 2.4vw, 28px);
   box-shadow: var(--shadow-lg);
   position: relative;
   overflow: hidden;
+  width: 100%;
+  min-width: 0;
 }
 
 .upload-card::before {
@@ -378,6 +382,8 @@ h1.hero-title em::after {
   justify-content: space-between;
   align-items: center;
   margin-bottom: 22px;
+  gap: 12px;
+  flex-wrap: wrap;
 }
 
 .uc-head h3 {
@@ -394,6 +400,7 @@ h1.hero-title em::after {
   padding: 3px;
   border-radius: 8px;
   font-size: 12px;
+  flex-shrink: 0;
 }
 
 .uc-tab {
@@ -403,6 +410,7 @@ h1.hero-title em::after {
   color: var(--ink-soft);
   font-weight: 500;
   transition: all 0.2s;
+  white-space: nowrap;
 }
 
 .uc-tab.active {
@@ -412,9 +420,10 @@ h1.hero-title em::after {
 }
 
 .dropzone {
+  display: block;
   border: 2px dashed var(--line);
   border-radius: var(--radius);
-  padding: 44px 24px;
+  padding: clamp(28px, 4.5vw, 44px) clamp(16px, 2.5vw, 24px);
   text-align: center;
   background: var(--bg-soft);
   position: relative;
@@ -450,6 +459,8 @@ h1.hero-title em::after {
   font-size: 12px;
   color: var(--ink-faint);
   font-family: 'JetBrains Mono', monospace;
+  display: block;
+  word-break: break-word;
 }
 
 .uc-files {
@@ -469,6 +480,7 @@ h1.hero-title em::after {
   font-size: 13px;
   border: 1px solid transparent;
   transition: all 0.2s;
+  min-width: 0;
 }
 
 .uc-file:hover { border-color: var(--line); }
@@ -487,11 +499,21 @@ h1.hero-title em::after {
   flex-shrink: 0;
 }
 
-.uc-file-name { flex: 1; font-weight: 500; }
+.uc-file-name {
+  flex: 1;
+  min-width: 0;
+  font-weight: 500;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
 .uc-file-size {
   color: var(--ink-faint);
   font-family: 'JetBrains Mono', monospace;
   font-size: 11px;
+  flex-shrink: 0;
+  white-space: nowrap;
 }
 
 .uc-file-status {
@@ -503,6 +525,7 @@ h1.hero-title em::after {
   display: grid;
   place-items: center;
   font-size: 10px;
+  flex-shrink: 0;
 }
 
 .uc-action {
@@ -820,11 +843,14 @@ h1.hero-title em::after {
   .nav-links { display: none; }
   .hero-stats { gap: 22px; flex-wrap: wrap; }
   .float-tag-1, .float-tag-2 { display: none; }
+  .hero-visual { max-width: 520px; margin: 0 auto; }
 }
 
 @media (max-width: 520px) {
   .topbar-actions .btn { display: none; }
   .footer { flex-direction: column; text-align: center; }
+  .uc-file-size { display: none; }
+  .uc-head h3 { font-size: 17px; }
 }
 </style>
 </head>
