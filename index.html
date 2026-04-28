@@ -517,8 +517,8 @@ h1.hero-title em::after {
 }
 
 .uc-file-status {
-  width: 16px;
-  height: 16px;
+  width: 18px;
+  height: 18px;
   border-radius: 50%;
   background: var(--blue);
   color: white;
@@ -526,13 +526,35 @@ h1.hero-title em::after {
   place-items: center;
   font-size: 10px;
   flex-shrink: 0;
+  border: none;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.uc-file-status:hover {
+  background: var(--ink);
+  transform: scale(1.1);
+}
+
+[data-theme="dark"] .uc-file-status:hover { background: var(--blue-bright); }
+
+.uc-empty {
+  margin-top: 18px;
+  padding: 16px;
+  text-align: center;
+  font-size: 13px;
+  color: var(--ink-faint);
+  font-family: 'JetBrains Mono', monospace;
+  border: 1px dashed var(--line);
+  border-radius: 10px;
+  background: transparent;
 }
 
 .uc-action {
   margin-top: 18px;
   display: flex;
   gap: 10px;
-  align-items: center;
+  align-items: stretch;
 }
 
 .btn-sort {
@@ -543,6 +565,7 @@ h1.hero-title em::after {
   border-radius: 11px;
   font-weight: 600;
   font-size: 14px;
+  font-family: inherit;
   border: none;
   cursor: pointer;
   display: flex;
@@ -552,50 +575,120 @@ h1.hero-title em::after {
   transition: all 0.2s;
 }
 
-.btn-sort:hover { transform: translateY(-1px); }
+.btn-sort:hover:not(:disabled) { transform: translateY(-1px); }
 
-.float-tag {
-  position: absolute;
-  background: var(--bg-elev);
+.btn-sort:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.btn-sort.processing {
+  background: var(--blue);
+  color: white;
+  cursor: wait;
+}
+
+[data-theme="dark"] .btn-sort.processing { color: #050b1c; }
+
+.btn-clear {
+  width: 46px;
+  background: transparent;
+  border: 1px solid var(--line);
+  border-radius: 11px;
+  color: var(--ink-soft);
+  cursor: pointer;
+  display: grid;
+  place-items: center;
+  transition: all 0.2s;
+  font-family: inherit;
+}
+
+.btn-clear:hover {
+  border-color: #d94646;
+  color: #d94646;
+  background: rgba(217, 70, 70, 0.06);
+}
+
+/* Dropzone drag-over state */
+.dropzone.is-dragover {
+  border-color: var(--blue);
+  background: var(--blue-tint);
+  transform: scale(1.005);
+}
+
+.dropzone.is-dragover .dropzone-icon {
+  color: var(--blue);
+  border-color: var(--blue);
+  transform: scale(1.08);
+}
+
+.dropzone-icon { transition: all 0.2s; }
+
+/* Progress bar */
+.uc-progress {
+  margin-top: 14px;
+  height: 4px;
+  background: var(--bg-soft);
+  border-radius: 99px;
+  overflow: hidden;
+  display: none;
+}
+
+.uc-progress.active { display: block; }
+
+.uc-progress-bar {
+  height: 100%;
+  width: 0%;
+  background: linear-gradient(90deg, var(--blue), var(--blue-bright));
+  border-radius: 99px;
+  transition: width 0.3s ease;
+}
+
+/* Result download row */
+.uc-result {
+  margin-top: 14px;
+  padding: 14px;
+  background: var(--blue-tint);
   border: 1px solid var(--line);
   border-radius: 12px;
-  padding: 10px 14px;
+  display: none;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.uc-result.active { display: flex; }
+
+.uc-result-head {
+  font-size: 12px;
+  font-family: 'JetBrains Mono', monospace;
+  color: var(--blue);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.uc-result-row {
   display: flex;
+  justify-content: space-between;
   align-items: center;
   gap: 10px;
   font-size: 13px;
-  font-weight: 500;
-  box-shadow: var(--shadow-md);
+  color: var(--ink);
 }
 
-.float-tag-1 {
-  top: -18px;
-  right: -22px;
-  animation: float 6s ease-in-out infinite;
-}
+.uc-result-row strong { font-weight: 600; }
 
-.float-tag-2 {
-  bottom: -22px;
-  left: -28px;
-  animation: float 6s ease-in-out infinite 3s;
-}
-
-@keyframes float {
-  0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(-8px); }
-}
-
-.float-tag .badge {
-  width: 22px; height: 22px;
-  border-radius: 6px;
-  background: var(--blue-tint);
+.uc-result-row a {
   color: var(--blue);
-  display: grid;
-  place-items: center;
-  font-size: 11px;
-  font-weight: 700;
-  font-family: 'JetBrains Mono', monospace;
+  text-decoration: none;
+  font-weight: 600;
+  font-size: 12px;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  white-space: nowrap;
 }
+
+.uc-result-row a:hover { text-decoration: underline; }
 
 /* ========== SECTION ========== */
 .section {
@@ -842,7 +935,6 @@ h1.hero-title em::after {
   .topbar-inner { padding: 12px 20px; }
   .nav-links { display: none; }
   .hero-stats { gap: 22px; flex-wrap: wrap; }
-  .float-tag-1, .float-tag-2 { display: none; }
   .hero-visual { max-width: 520px; margin: 0 auto; }
 }
 
@@ -931,67 +1023,61 @@ h1.hero-title em::after {
       </div>
 
       <div class="hero-visual">
-        <div class="float-tag float-tag-1">
-          <span class="badge">QP</span>
-          <span>Question paper</span>
-        </div>
-
         <div class="upload-card" id="sort">
           <div class="uc-head">
             <h3>New batch</h3>
             <div class="uc-tabs">
-              <div class="uc-tab active">Papers</div>
-              <div class="uc-tab">Mark schemes</div>
+              <div class="uc-tab active" data-lane="papers">Papers</div>
+              <div class="uc-tab" data-lane="schemes">Mark schemes</div>
             </div>
           </div>
 
-          <label class="dropzone" for="fileInput">
+          <label class="dropzone" id="dropzone" for="fileInput">
             <div class="dropzone-icon">
               <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M17 8l-5-5-5 5M12 3v12"/></svg>
             </div>
             <p>Drop PDFs or .zip files here</p>
-            <small>or click to browse — up to 100 files</small>
-            <input type="file" id="fileInput" multiple style="display:none" accept=".pdf,.zip">
+            <small id="dropzoneHint">or click to browse — up to 100 files</small>
+            <input type="file" id="fileInput" multiple style="display:none" accept=".pdf,.zip,application/pdf,application/zip">
           </label>
 
-          <div class="uc-files">
-            <div class="uc-file">
-              <span class="uc-file-icon">PDF</span>
-              <span class="uc-file-name">9701_w23_qp_42.pdf</span>
-              <span class="uc-file-size">1.2 MB</span>
-              <span class="uc-file-status">
-                <svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
-              </span>
+          <div class="uc-empty" id="ucEmpty">
+            <span>No files yet — drop some PDFs above</span>
+          </div>
+
+          <div class="uc-files" id="ucFiles" hidden></div>
+
+          <div class="uc-progress" id="ucProgress">
+            <div class="uc-progress-bar" id="ucProgressBar"></div>
+          </div>
+
+          <div class="uc-result" id="ucResult">
+            <div class="uc-result-head">// ready to download</div>
+            <div class="uc-result-row">
+              <span><strong>Topical questions</strong> · <span id="resultPaperCount">0</span> pages</span>
+              <a href="#" id="downloadPapers">
+                Download
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg>
+              </a>
             </div>
-            <div class="uc-file">
-              <span class="uc-file-icon">PDF</span>
-              <span class="uc-file-name">9701_s23_qp_41.pdf</span>
-              <span class="uc-file-size">1.4 MB</span>
-              <span class="uc-file-status">
-                <svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
-              </span>
-            </div>
-            <div class="uc-file">
-              <span class="uc-file-icon">ZIP</span>
-              <span class="uc-file-name">chemistry_2018_2022.zip</span>
-              <span class="uc-file-size">24.6 MB</span>
-              <span class="uc-file-status">
-                <svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
-              </span>
+            <div class="uc-result-row" id="resultSchemesRow">
+              <span><strong>Mark schemes</strong> · <span id="resultSchemeCount">0</span> pages</span>
+              <a href="#" id="downloadSchemes">
+                Download
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg>
+              </a>
             </div>
           </div>
 
           <div class="uc-action">
-            <button class="btn-sort">
-              Sort into topics
+            <button class="btn-sort" id="btnSort" disabled>
+              <span class="btn-sort-label">Sort into topics</span>
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
             </button>
+            <button class="btn-clear" id="btnClear" hidden aria-label="Clear all files">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2m3 0v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"/></svg>
+            </button>
           </div>
-        </div>
-
-        <div class="float-tag float-tag-2">
-          <span class="badge">MS</span>
-          <span>Mark scheme</span>
         </div>
       </div>
     </div>
@@ -1141,43 +1227,344 @@ h1.hero-title em::after {
   </footer>
 </main>
 
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf-lib/1.17.1/pdf-lib.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
 <script>
-  // Theme toggle
+  // ===== Theme toggle =====
   const themeToggle = document.getElementById('themeToggle');
   const root = document.documentElement;
-
-  // Load saved preference if available (in-memory only since localStorage isn't available in artifacts)
   themeToggle.addEventListener('click', () => {
     const current = root.getAttribute('data-theme');
     root.setAttribute('data-theme', current === 'light' ? 'dark' : 'light');
   });
 
-  // File input feedback
-  const fileInput = document.getElementById('fileInput');
-  if (fileInput) {
-    fileInput.addEventListener('change', (e) => {
-      console.log('Files selected:', e.target.files.length);
-    });
-  }
+  // ===== State =====
+  // Two lanes — papers and mark schemes — each holding {id, name, size, file (File or {bytes,name})}
+  const state = {
+    papers: [],
+    schemes: [],
+    currentLane: 'papers',
+    nextId: 1,
+    output: null, // {papersBlob, schemesBlob, paperPages, schemePages}
+  };
 
-  // Tab switching in upload card
-  document.querySelectorAll('.uc-tab').forEach(tab => {
-    tab.addEventListener('click', (e) => {
-      document.querySelectorAll('.uc-tab').forEach(t => t.classList.remove('active'));
-      e.target.classList.add('active');
+  const MAX_FILES_PER_LANE = 100;
+
+  // ===== DOM =====
+  const fileInput     = document.getElementById('fileInput');
+  const dropzone      = document.getElementById('dropzone');
+  const dropzoneHint  = document.getElementById('dropzoneHint');
+  const ucEmpty       = document.getElementById('ucEmpty');
+  const ucFiles       = document.getElementById('ucFiles');
+  const btnSort       = document.getElementById('btnSort');
+  const btnClear      = document.getElementById('btnClear');
+  const ucProgress    = document.getElementById('ucProgress');
+  const ucProgressBar = document.getElementById('ucProgressBar');
+  const ucResult      = document.getElementById('ucResult');
+  const downloadPapersLink  = document.getElementById('downloadPapers');
+  const downloadSchemesLink = document.getElementById('downloadSchemes');
+  const resultPaperCount    = document.getElementById('resultPaperCount');
+  const resultSchemeCount   = document.getElementById('resultSchemeCount');
+  const resultSchemesRow    = document.getElementById('resultSchemesRow');
+  const tabs = document.querySelectorAll('.uc-tab');
+
+  // ===== Lane tabs =====
+  tabs.forEach(tab => {
+    tab.addEventListener('click', () => {
+      tabs.forEach(t => t.classList.remove('active'));
+      tab.classList.add('active');
+      state.currentLane = tab.dataset.lane;
+      renderFiles();
+      updateHint();
     });
   });
 
-  // Reveal on scroll
-  const observer = new IntersectionObserver((entries) => {
-    entries.forEach(entry => {
-      if (entry.isIntersecting) {
-        entry.target.classList.add('visible');
+  function updateHint() {
+    const lane = state.currentLane === 'papers' ? 'past papers' : 'mark schemes';
+    dropzoneHint.textContent = `${lane} — PDFs or .zip · up to ${MAX_FILES_PER_LANE} files`;
+  }
+  updateHint();
+
+  // ===== File input =====
+  fileInput.addEventListener('change', async (e) => {
+    await handleIncoming(Array.from(e.target.files));
+    fileInput.value = ''; // reset so same file can be re-selected
+  });
+
+  // ===== Drag & drop =====
+  ['dragenter', 'dragover'].forEach(evt => {
+    dropzone.addEventListener(evt, (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      dropzone.classList.add('is-dragover');
+    });
+  });
+
+  ['dragleave', 'drop'].forEach(evt => {
+    dropzone.addEventListener(evt, (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      // only remove if leaving the dropzone itself, not a child
+      if (evt === 'drop' || e.target === dropzone) {
+        dropzone.classList.remove('is-dragover');
       }
     });
-  }, { threshold: 0.12 });
+  });
 
+  dropzone.addEventListener('drop', async (e) => {
+    const dropped = Array.from(e.dataTransfer.files);
+    await handleIncoming(dropped);
+  });
+
+  // Prevent the browser from opening dropped files anywhere on the page
+  ['dragover', 'drop'].forEach(evt => {
+    window.addEventListener(evt, (e) => {
+      if (!dropzone.contains(e.target)) e.preventDefault();
+    });
+  });
+
+  // ===== Core: ingest dropped or selected files =====
+  async function handleIncoming(rawFiles) {
+    const lane = state.currentLane;
+    const expanded = [];
+
+    for (const file of rawFiles) {
+      const lower = file.name.toLowerCase();
+      if (lower.endsWith('.zip')) {
+        // Unpack zip and pull all PDFs out
+        try {
+          const zip = await JSZip.loadAsync(file);
+          const entries = Object.values(zip.files).filter(
+            f => !f.dir && f.name.toLowerCase().endsWith('.pdf')
+          );
+          for (const entry of entries) {
+            const bytes = await entry.async('uint8array');
+            expanded.push({
+              name: entry.name.split('/').pop(),
+              size: bytes.byteLength,
+              bytes,
+              fromZip: true,
+            });
+          }
+        } catch (err) {
+          console.error('Failed to read zip:', file.name, err);
+        }
+      } else if (lower.endsWith('.pdf') || file.type === 'application/pdf') {
+        const bytes = new Uint8Array(await file.arrayBuffer());
+        expanded.push({
+          name: file.name,
+          size: file.size,
+          bytes,
+          fromZip: false,
+        });
+      }
+      // silently skip anything else
+    }
+
+    // Add to lane, respecting cap
+    const remaining = MAX_FILES_PER_LANE - state[lane].length;
+    const toAdd = expanded.slice(0, remaining);
+    for (const f of toAdd) {
+      state[lane].push({
+        id: state.nextId++,
+        name: f.name,
+        size: f.size,
+        bytes: f.bytes,
+        fromZip: f.fromZip,
+      });
+    }
+
+    // Reset any prior output if the user added new files
+    state.output = null;
+    ucResult.classList.remove('active');
+
+    renderFiles();
+  }
+
+  // ===== Render the file list for the current lane =====
+  function renderFiles() {
+    const lane = state.currentLane;
+    const files = state[lane];
+
+    ucFiles.innerHTML = '';
+
+    if (files.length === 0) {
+      ucEmpty.hidden = false;
+      ucFiles.hidden = true;
+      ucEmpty.querySelector('span').textContent = state.currentLane === 'papers'
+        ? 'No papers yet — drop PDFs above'
+        : 'No mark schemes yet — drop PDFs above (optional)';
+    } else {
+      ucEmpty.hidden = true;
+      ucFiles.hidden = false;
+      for (const f of files) {
+        ucFiles.appendChild(buildFileRow(f, lane));
+      }
+    }
+
+    updateButtons();
+  }
+
+  function buildFileRow(f, lane) {
+    const row = document.createElement('div');
+    row.className = 'uc-file';
+    row.innerHTML = `
+      <span class="uc-file-icon">${f.fromZip ? 'ZIP' : 'PDF'}</span>
+      <span class="uc-file-name" title="${escapeHTML(f.name)}">${escapeHTML(f.name)}</span>
+      <span class="uc-file-size">${formatSize(f.size)}</span>
+      <button class="uc-file-status" aria-label="Remove">
+        <svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><line x1="6" y1="6" x2="18" y2="18"/><line x1="6" y1="18" x2="18" y2="6"/></svg>
+      </button>
+    `;
+    row.querySelector('.uc-file-status').addEventListener('click', () => {
+      state[lane] = state[lane].filter(x => x.id !== f.id);
+      state.output = null;
+      ucResult.classList.remove('active');
+      renderFiles();
+    });
+    return row;
+  }
+
+  function escapeHTML(s) {
+    return s.replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+  }
+
+  function formatSize(bytes) {
+    if (bytes < 1024) return bytes + ' B';
+    if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + ' KB';
+    return (bytes / 1024 / 1024).toFixed(1) + ' MB';
+  }
+
+  function updateButtons() {
+    const total = state.papers.length + state.schemes.length;
+    btnSort.disabled = state.papers.length === 0;
+    btnClear.hidden = total === 0;
+  }
+
+  // ===== Clear all =====
+  btnClear.addEventListener('click', () => {
+    state.papers = [];
+    state.schemes = [];
+    state.output = null;
+    ucResult.classList.remove('active');
+    ucProgress.classList.remove('active');
+    ucProgressBar.style.width = '0%';
+    renderFiles();
+  });
+
+  // ===== Sort: merge into topical PDFs =====
+  // NOTE: actual topic classification requires an AI/text-analysis backend.
+  // This frontend extracts every page from the uploaded PDFs and stitches
+  // them into two combined output PDFs (questions + mark schemes), which is
+  // the core file-extraction & merging step. A backend would slot in here
+  // to reorder pages by classified topic before final assembly.
+  btnSort.addEventListener('click', async () => {
+    if (state.papers.length === 0) return;
+
+    btnSort.disabled = true;
+    btnSort.classList.add('processing');
+    btnSort.querySelector('.btn-sort-label').textContent = 'Processing…';
+    ucProgress.classList.add('active');
+    ucResult.classList.remove('active');
+    ucProgressBar.style.width = '0%';
+
+    try {
+      const total = state.papers.length + state.schemes.length;
+      let done = 0;
+
+      const papersOut = await PDFLib.PDFDocument.create();
+      for (const f of state.papers) {
+        try {
+          const src = await PDFLib.PDFDocument.load(f.bytes, { ignoreEncryption: true });
+          const pages = await papersOut.copyPages(src, src.getPageIndices());
+          pages.forEach(p => papersOut.addPage(p));
+        } catch (err) {
+          console.warn('Skipped paper (could not parse):', f.name, err);
+        }
+        done++;
+        ucProgressBar.style.width = ((done / total) * 100) + '%';
+        await new Promise(r => setTimeout(r, 0)); // yield to UI
+      }
+      const papersBytes = await papersOut.save();
+      const papersBlob = new Blob([papersBytes], { type: 'application/pdf' });
+
+      let schemesBlob = null;
+      let schemePages = 0;
+      if (state.schemes.length > 0) {
+        const schemesOut = await PDFLib.PDFDocument.create();
+        for (const f of state.schemes) {
+          try {
+            const src = await PDFLib.PDFDocument.load(f.bytes, { ignoreEncryption: true });
+            const pages = await schemesOut.copyPages(src, src.getPageIndices());
+            pages.forEach(p => schemesOut.addPage(p));
+          } catch (err) {
+            console.warn('Skipped scheme (could not parse):', f.name, err);
+          }
+          done++;
+          ucProgressBar.style.width = ((done / total) * 100) + '%';
+          await new Promise(r => setTimeout(r, 0));
+        }
+        schemePages = schemesOut.getPageCount();
+        const schemesBytes = await schemesOut.save();
+        schemesBlob = new Blob([schemesBytes], { type: 'application/pdf' });
+      }
+
+      state.output = {
+        papersBlob,
+        schemesBlob,
+        paperPages: papersOut.getPageCount(),
+        schemePages,
+      };
+
+      // Wire download links
+      if (downloadPapersLink.dataset.url) URL.revokeObjectURL(downloadPapersLink.dataset.url);
+      const papersUrl = URL.createObjectURL(papersBlob);
+      downloadPapersLink.href = papersUrl;
+      downloadPapersLink.download = 'topical-questions.pdf';
+      downloadPapersLink.dataset.url = papersUrl;
+      resultPaperCount.textContent = state.output.paperPages;
+
+      if (schemesBlob) {
+        if (downloadSchemesLink.dataset.url) URL.revokeObjectURL(downloadSchemesLink.dataset.url);
+        const schemesUrl = URL.createObjectURL(schemesBlob);
+        downloadSchemesLink.href = schemesUrl;
+        downloadSchemesLink.download = 'topical-mark-schemes.pdf';
+        downloadSchemesLink.dataset.url = schemesUrl;
+        resultSchemeCount.textContent = schemePages;
+        resultSchemesRow.style.display = '';
+      } else {
+        resultSchemesRow.style.display = 'none';
+      }
+
+      ucResult.classList.add('active');
+
+      // Hold full bar briefly, then collapse
+      setTimeout(() => {
+        ucProgress.classList.remove('active');
+        ucProgressBar.style.width = '0%';
+      }, 600);
+
+    } catch (err) {
+      console.error('Sort failed:', err);
+      alert('Something went wrong while processing the PDFs. Check the console for details.');
+      ucProgress.classList.remove('active');
+    } finally {
+      btnSort.disabled = state.papers.length === 0;
+      btnSort.classList.remove('processing');
+      btnSort.querySelector('.btn-sort-label').textContent = 'Sort into topics';
+    }
+  });
+
+  // ===== Reveal on scroll =====
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) entry.target.classList.add('visible');
+    });
+  }, { threshold: 0.12 });
   document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+
+  // Initial render
+  renderFiles();
 </script>
 
 </body>
