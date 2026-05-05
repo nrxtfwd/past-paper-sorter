@@ -644,6 +644,83 @@ h1.hero-title em::after {
   transition: width 0.3s ease;
 }
 
+.uc-status {
+  margin-top: 10px;
+  font-size: 12px;
+  font-family: 'JetBrains Mono', monospace;
+  color: var(--ink-soft);
+  letter-spacing: 0.01em;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.uc-status::before {
+  content: '';
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--blue);
+  animation: pulse 1.4s ease infinite;
+  flex-shrink: 0;
+}
+
+.uc-options {
+  margin-top: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.uc-option-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: var(--bg-soft);
+  border: 1px solid var(--line-soft);
+  border-radius: 10px;
+  padding: 9px 12px;
+  transition: border-color 0.2s;
+}
+
+.uc-option-row:focus-within {
+  border-color: var(--blue);
+}
+
+.uc-option-label {
+  font-size: 11px;
+  font-family: 'JetBrains Mono', monospace;
+  color: var(--ink-faint);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.uc-option-label em {
+  font-style: normal;
+  text-transform: none;
+  letter-spacing: 0;
+  opacity: 0.7;
+}
+
+.uc-option-input {
+  flex: 1;
+  min-width: 0;
+  border: none;
+  background: transparent;
+  color: var(--ink);
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 500;
+  outline: none;
+}
+
+.uc-option-input::placeholder {
+  color: var(--ink-faint);
+  font-weight: 400;
+}
+
 /* Result download row */
 .uc-result {
   margin-top: 14px;
@@ -1050,6 +1127,18 @@ h1.hero-title em::after {
           <div class="uc-progress" id="ucProgress">
             <div class="uc-progress-bar" id="ucProgressBar"></div>
           </div>
+          <div class="uc-status" id="ucStatus" hidden></div>
+
+          <div class="uc-options" id="ucOptions">
+            <label class="uc-option-row">
+              <span class="uc-option-label">Subject</span>
+              <input type="text" id="subjectInput" class="uc-option-input" placeholder="e.g. A-Level Chemistry" value="A-Level Chemistry">
+            </label>
+            <label class="uc-option-row">
+              <span class="uc-option-label">Topic filter <em>(optional)</em></span>
+              <input type="text" id="topicFilter" class="uc-option-input" placeholder="leave blank for all topics">
+            </label>
+          </div>
 
           <div class="uc-result" id="ucResult">
             <div class="uc-result-head">// ready to download</div>
@@ -1229,6 +1318,13 @@ h1.hero-title em::after {
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf-lib/1.17.1/pdf-lib.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+<script>
+  // Configure pdf.js worker
+  if (window['pdfjsLib']) {
+    pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+  }
+</script>
 <script>
   // ===== Theme toggle =====
   const themeToggle = document.getElementById('themeToggle');
@@ -1449,17 +1545,407 @@ h1.hero-title em::after {
     ucResult.classList.remove('active');
     ucProgress.classList.remove('active');
     ucProgressBar.style.width = '0%';
+    setStatus('');
     renderFiles();
   });
 
-  // ===== Sort: merge into topical PDFs =====
-  // NOTE: actual topic classification requires an AI/text-analysis backend.
-  // This frontend extracts every page from the uploaded PDFs and stitches
-  // them into two combined output PDFs (questions + mark schemes), which is
-  // the core file-extraction & merging step. A backend would slot in here
-  // to reorder pages by classified topic before final assembly.
+  // ===== DOM (additions for backend) =====
+  const ucStatus     = document.getElementById('ucStatus');
+  const subjectInput = document.getElementById('subjectInput');
+  const topicFilter  = document.getElementById('topicFilter');
+
+  function setStatus(text) {
+    if (!text) { ucStatus.hidden = true; return; }
+    ucStatus.hidden = false;
+    ucStatus.textContent = text;
+  }
+
+  // ===== Page-text extraction via pdf.js =====
+  // Returns array of { pageIndex, text } for a given Uint8Array PDF.
+  async function extractPageTexts(bytes) {
+    // pdf.js mutates the buffer — pass a copy
+    const copy = new Uint8Array(bytes);
+    const loadingTask = pdfjsLib.getDocument({ data: copy });
+    const pdf = await loadingTask.promise;
+    const out = [];
+    for (let i = 1; i <= pdf.numPages; i++) {
+      try {
+        const page = await pdf.getPage(i);
+        const content = await page.getTextContent();
+        const text = content.items.map(item => item.str).join(' ').replace(/\s+/g, ' ').trim();
+        out.push({ pageIndex: i - 1, text });
+      } catch (err) {
+        out.push({ pageIndex: i - 1, text: '' });
+      }
+    }
+    return out;
+  }
+
+  // ===== Classify pages with Claude =====
+  // Sends a batch of page texts and asks for {pageIndex -> topic}.
+  // Truncates text per page to keep prompts reasonable.
+  async function classifyBatch(pages, subject) {
+    const PER_PAGE_CHAR_LIMIT = 1200;
+    const compact = pages.map(p => ({
+      i: p.globalIndex,
+      // Send a bit of length info — helps detect mostly-blank answer pages
+      len: (p.text || '').length,
+      t: (p.text || '').slice(0, PER_PAGE_CHAR_LIMIT),
+    }));
+
+    const systemPrompt = `You are a past-paper question classifier for ${subject}. For EACH page given, identify the single best-fitting curriculum topic. Use canonical topic names from the standard ${subject} syllabus (concise — 2-4 words, e.g. "Atomic Structure", "Alcohols", "Kinematics", "Proof", "Differentiation").
+
+Use the SPECIAL topic "Skip" for any page that should not appear in the output:
+- Cover/title pages (subject code, candidate number boxes, exam board branding)
+- Instructions/rubric pages ("Answer all questions", "Calculators allowed", etc.)
+- Formula sheets, periodic tables, data booklets
+- Pages that are essentially blank answer space with no actual question content (very low character count, mostly answer lines)
+- Continuation pages that are purely lined answer space with no question text
+
+If a page genuinely contains questions from multiple topics, pick the dominant one. Reply with ONLY a JSON array of objects: [{"i": <pageIndex>, "topic": "<topic name>"}]. No prose, no markdown, no code fences.`;
+
+    const userMsg = `Pages to classify:\n\n${JSON.stringify(compact)}`;
+
+    const response = await fetch("https://api.anthropic.com/v1/messages", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        model: "claude-sonnet-4-20250514",
+        max_tokens: 4000,
+        system: systemPrompt,
+        messages: [{ role: "user", content: userMsg }],
+      }),
+    });
+
+    if (!response.ok) {
+      const err = await response.text();
+      throw new Error(`API error ${response.status}: ${err.slice(0, 200)}`);
+    }
+
+    const data = await response.json();
+    const text = data.content.map(b => b.type === 'text' ? b.text : '').join('').trim();
+
+    // Strip code fences if Claude added any anyway
+    const cleaned = text.replace(/^```(?:json)?\s*/i, '').replace(/```\s*$/, '').trim();
+    let arr;
+    try {
+      arr = JSON.parse(cleaned);
+    } catch (e) {
+      const m = cleaned.match(/\[[\s\S]*\]/);
+      if (m) arr = JSON.parse(m[0]);
+      else throw new Error('Could not parse classifier response');
+    }
+
+    const map = {};
+    for (const item of arr) {
+      if (typeof item.i === 'number' && typeof item.topic === 'string') {
+        map[item.i] = item.topic.trim();
+      }
+    }
+    return map;
+  }
+
+  // ===== Consolidate similar topic names =====
+  // After classification, raw topics may have variants like
+  // "Alcohols" / "Organic — Alcohols" / "Organic Chemistry: Alcohols".
+  // We ask Claude to map them all to canonical names.
+  async function consolidateTopics(rawTopics, subject) {
+    if (rawTopics.length <= 1) {
+      const m = {};
+      rawTopics.forEach(t => m[t] = t);
+      return m;
+    }
+
+    const systemPrompt = `You are organizing topic labels for ${subject} past papers. You'll receive a list of raw topic names from an earlier classification step. Some are duplicates phrased differently (e.g. "Alcohols" vs "Organic Chemistry: Alcohols"). Group them into canonical curriculum-aligned topic names — concise (2-4 words). Reply with ONLY a JSON object mapping each raw input to its canonical name. Example: {"Alcohols": "Alcohols", "Organic Chemistry: Alcohols": "Alcohols"}. No prose, no markdown, no code fences.`;
+
+    const response = await fetch("https://api.anthropic.com/v1/messages", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        model: "claude-sonnet-4-20250514",
+        max_tokens: 2000,
+        system: systemPrompt,
+        messages: [{ role: "user", content: `Raw topics:\n${JSON.stringify(rawTopics)}` }],
+      }),
+    });
+
+    if (!response.ok) throw new Error(`Consolidation API error ${response.status}`);
+    const data = await response.json();
+    const text = data.content.map(b => b.type === 'text' ? b.text : '').join('').trim();
+    const cleaned = text.replace(/^```(?:json)?\s*/i, '').replace(/```\s*$/, '').trim();
+
+    let parsed;
+    try {
+      parsed = JSON.parse(cleaned);
+    } catch (e) {
+      const m = cleaned.match(/\{[\s\S]*\}/);
+      if (m) parsed = JSON.parse(m[0]);
+      else throw new Error('Could not parse consolidation response');
+    }
+
+    const map = {};
+    for (const raw of rawTopics) {
+      map[raw] = (typeof parsed[raw] === 'string' && parsed[raw].trim()) ? parsed[raw].trim() : raw;
+    }
+    return map;
+  }
+
+  // Normalize topic names so minor variations group together
+  function normalizeTopic(t) {
+    return t
+      .toLowerCase()
+      .replace(/[^a-z0-9 :]/g, ' ')
+      .replace(/\s+/g, ' ')
+      .trim();
+  }
+
+  // ===== Main: classify + reorder =====
+  async function classifyAndAssemble(lane, subject, topicFilterStr, onProgress) {
+    // 1. Extract text from every page across every file in this lane
+    setStatus(`Reading ${lane === 'papers' ? 'papers' : 'mark schemes'}…`);
+
+    const allPages = []; // { fileIdx, pageIdx, text, globalIndex, sourceBytes }
+    let globalIndex = 0;
+    const files = state[lane];
+
+    for (let fIdx = 0; fIdx < files.length; fIdx++) {
+      const f = files[fIdx];
+      try {
+        const pages = await extractPageTexts(f.bytes);
+        for (const p of pages) {
+          allPages.push({
+            fileIdx: fIdx,
+            pageIdx: p.pageIndex,
+            text: p.text,
+            globalIndex: globalIndex++,
+          });
+        }
+      } catch (err) {
+        console.warn('Could not read text from', f.name, err);
+      }
+      onProgress((fIdx + 1) / files.length * 0.3); // 0–30% for extraction
+    }
+
+    if (allPages.length === 0) {
+      throw new Error('No readable pages found.');
+    }
+
+    // 2. Classify in batches
+    setStatus(`Classifying ${allPages.length} pages with AI…`);
+    const BATCH_SIZE = 12;
+    const topicMap = {}; // globalIndex -> topic
+    const batches = [];
+    for (let i = 0; i < allPages.length; i += BATCH_SIZE) {
+      batches.push(allPages.slice(i, i + BATCH_SIZE));
+    }
+
+    for (let bIdx = 0; bIdx < batches.length; bIdx++) {
+      const batch = batches[bIdx];
+      try {
+        const map = await classifyBatch(batch, subject);
+        Object.assign(topicMap, map);
+      } catch (err) {
+        console.warn('Batch classification failed, marking pages Unsorted:', err);
+        for (const p of batch) topicMap[p.globalIndex] = 'Unsorted';
+      }
+      onProgress(0.3 + ((bIdx + 1) / batches.length) * 0.5); // 30–80% for classify
+    }
+
+    // 3. Filter out Skip pages and apply topic filter
+    setStatus('Grouping by topic…');
+    const filterNorm = topicFilterStr ? normalizeTopic(topicFilterStr) : null;
+
+    const SKIP_TOPICS = new Set(['skip', 'front matter', 'unsorted']);
+    const keptPages = [];
+    let skippedCount = 0;
+    for (const page of allPages) {
+      const topic = (topicMap[page.globalIndex] || 'Unsorted').trim();
+      const norm = normalizeTopic(topic);
+      if (SKIP_TOPICS.has(norm)) { skippedCount++; continue; }
+      if (filterNorm && !norm.includes(filterNorm)) continue;
+      keptPages.push({ ...page, rawTopic: topic });
+    }
+
+    if (keptPages.length === 0) {
+      throw new Error(filterNorm
+        ? `No pages matched topic filter "${topicFilterStr}".`
+        : 'No content pages were classified.');
+    }
+
+    // 3b. Consolidate similar topic names into canonical buckets.
+    // This is the step that makes "Alcohols", "Organic — Alcohols", and
+    // "Organic Chemistry: Alcohols" all collapse into one section.
+    let canonicalMap = {};
+    const uniqueRaw = [...new Set(keptPages.map(p => p.rawTopic))];
+    if (!filterNorm && uniqueRaw.length > 1) {
+      setStatus('Consolidating topics…');
+      try {
+        canonicalMap = await consolidateTopics(uniqueRaw, subject);
+      } catch (err) {
+        console.warn('Consolidation failed, using raw topics:', err);
+        for (const t of uniqueRaw) canonicalMap[t] = t;
+      }
+    } else {
+      for (const t of uniqueRaw) canonicalMap[t] = t;
+    }
+
+    // 3c. Build groups using canonical names
+    const groups = new Map();
+    for (const p of keptPages) {
+      const canon = canonicalMap[p.rawTopic] || p.rawTopic;
+      if (!groups.has(canon)) groups.set(canon, []);
+      groups.get(canon).push(p);
+    }
+
+    // 4. Build the output PDF: one section per topic
+    setStatus('Assembling sorted PDF…');
+    const outDoc = await PDFLib.PDFDocument.create();
+
+    // Embed fonts once for all divider pages
+    const helvBold = await outDoc.embedFont(PDFLib.StandardFonts.HelveticaBold);
+    const helv = await outDoc.embedFont(PDFLib.StandardFonts.Helvetica);
+
+    // Pre-load each source PDF once (avoid reloading per page)
+    const sourceDocs = [];
+    for (let i = 0; i < files.length; i++) {
+      try {
+        sourceDocs[i] = await PDFLib.PDFDocument.load(files[i].bytes, { ignoreEncryption: true });
+      } catch (err) {
+        sourceDocs[i] = null;
+        console.warn('Could not open source for assembly:', files[i].name);
+      }
+    }
+
+    // Order topics by size (biggest first) so the most common topics appear up front.
+    // Falls back to alphabetical for ties.
+    const sortedTopics = [...groups.keys()].sort((a, b) => {
+      const diff = groups.get(b).length - groups.get(a).length;
+      return diff !== 0 ? diff : a.localeCompare(b);
+    });
+
+    for (const topic of sortedTopics) {
+      // Add a clear topic heading page
+      addDividerPage(outDoc, topic, groups.get(topic).length, helvBold, helv);
+
+      // Append pages from this topic, grouped by source file (preserves
+      // question continuity within the same paper)
+      const pagesByFile = {};
+      for (const p of groups.get(topic)) {
+        if (!pagesByFile[p.fileIdx]) pagesByFile[p.fileIdx] = [];
+        pagesByFile[p.fileIdx].push(p.pageIdx);
+      }
+
+      for (const fIdx of Object.keys(pagesByFile)) {
+        const src = sourceDocs[fIdx];
+        if (!src) continue;
+        const indices = pagesByFile[fIdx].sort((a, b) => a - b);
+        try {
+          const copied = await outDoc.copyPages(src, indices);
+          copied.forEach(p => outDoc.addPage(p));
+        } catch (err) {
+          console.warn('copyPages failed:', err);
+        }
+      }
+    }
+
+    onProgress(0.95);
+
+    const bytes = await outDoc.save();
+    onProgress(1.0);
+    return {
+      blob: new Blob([bytes], { type: 'application/pdf' }),
+      pageCount: outDoc.getPageCount(),
+      topicCount: sortedTopics.length,
+      skippedCount,
+    };
+  }
+
+  // Build a divider page with a clear topic heading at the top.
+  // Format: "Topic: Proof" prominently at the top, count below, plus a
+  // page-spanning blue band so it's obvious where one section ends.
+  function addDividerPage(doc, topic, count, fontBold, fontReg) {
+    const page = doc.addPage([595.28, 841.89]); // A4 portrait
+    const { width, height } = page.getSize();
+    const blue = PDFLib.rgb(0.114, 0.306, 0.847);
+    const inkSoft = PDFLib.rgb(0.4, 0.45, 0.55);
+    const inkFaint = PDFLib.rgb(0.6, 0.65, 0.72);
+
+    // Top blue band (visual separator that's instantly recognizable when
+    // scrolling through the PDF)
+    page.drawRectangle({
+      x: 0,
+      y: height - 8,
+      width: width,
+      height: 8,
+      color: blue,
+    });
+
+    // Eyebrow label "TOPIC"
+    page.drawText('TOPIC', {
+      x: 60,
+      y: height - 130,
+      size: 11,
+      font: fontBold,
+      color: blue,
+    });
+
+    // Big topic name — "Topic: Proof" style heading
+    const headingText = `Topic: ${topic}`;
+    const headingSize = chooseHeadingSize(headingText, fontBold, width - 120);
+    page.drawText(headingText, {
+      x: 60,
+      y: height - 180,
+      size: headingSize,
+      font: fontBold,
+      color: PDFLib.rgb(0.04, 0.09, 0.2),
+    });
+
+    // Underline accent
+    page.drawRectangle({
+      x: 60,
+      y: height - 200,
+      width: 90,
+      height: 3,
+      color: blue,
+    });
+
+    // Count
+    page.drawText(
+      `${count} question page${count === 1 ? '' : 's'} from this topic follow.`,
+      {
+        x: 60,
+        y: height - 230,
+        size: 13,
+        font: fontReg,
+        color: inkSoft,
+      }
+    );
+
+    // Footer
+    page.drawText('topical · sorted by AI', {
+      x: 60,
+      y: 40,
+      size: 9,
+      font: fontReg,
+      color: inkFaint,
+    });
+  }
+
+  // Pick a heading font size that fits within a max width.
+  function chooseHeadingSize(text, font, maxWidth) {
+    const candidates = [42, 36, 32, 28, 24, 20];
+    for (const size of candidates) {
+      if (font.widthOfTextAtSize(text, size) <= maxWidth) return size;
+    }
+    return 18;
+  }
+
+  // ===== Sort: full pipeline =====
   btnSort.addEventListener('click', async () => {
     if (state.papers.length === 0) return;
+
+    const subject = (subjectInput.value || 'past papers').trim();
+    const filterStr = (topicFilter.value || '').trim();
 
     btnSort.disabled = true;
     btnSort.classList.add('processing');
@@ -1467,86 +1953,69 @@ h1.hero-title em::after {
     ucProgress.classList.add('active');
     ucResult.classList.remove('active');
     ucProgressBar.style.width = '0%';
+    setStatus('Starting…');
 
     try {
-      const total = state.papers.length + state.schemes.length;
-      let done = 0;
+      // Papers = 0–60% of total progress, schemes = 60–100%
+      const hasSchemes = state.schemes.length > 0;
+      const papersWeight = hasSchemes ? 0.6 : 1.0;
 
-      const papersOut = await PDFLib.PDFDocument.create();
-      for (const f of state.papers) {
-        try {
-          const src = await PDFLib.PDFDocument.load(f.bytes, { ignoreEncryption: true });
-          const pages = await papersOut.copyPages(src, src.getPageIndices());
-          pages.forEach(p => papersOut.addPage(p));
-        } catch (err) {
-          console.warn('Skipped paper (could not parse):', f.name, err);
-        }
-        done++;
-        ucProgressBar.style.width = ((done / total) * 100) + '%';
-        await new Promise(r => setTimeout(r, 0)); // yield to UI
-      }
-      const papersBytes = await papersOut.save();
-      const papersBlob = new Blob([papersBytes], { type: 'application/pdf' });
+      const papersResult = await classifyAndAssemble(
+        'papers',
+        subject,
+        filterStr,
+        (frac) => { ucProgressBar.style.width = (frac * papersWeight * 100) + '%'; }
+      );
 
-      let schemesBlob = null;
-      let schemePages = 0;
-      if (state.schemes.length > 0) {
-        const schemesOut = await PDFLib.PDFDocument.create();
-        for (const f of state.schemes) {
-          try {
-            const src = await PDFLib.PDFDocument.load(f.bytes, { ignoreEncryption: true });
-            const pages = await schemesOut.copyPages(src, src.getPageIndices());
-            pages.forEach(p => schemesOut.addPage(p));
-          } catch (err) {
-            console.warn('Skipped scheme (could not parse):', f.name, err);
-          }
-          done++;
-          ucProgressBar.style.width = ((done / total) * 100) + '%';
-          await new Promise(r => setTimeout(r, 0));
-        }
-        schemePages = schemesOut.getPageCount();
-        const schemesBytes = await schemesOut.save();
-        schemesBlob = new Blob([schemesBytes], { type: 'application/pdf' });
+      let schemesResult = null;
+      if (hasSchemes) {
+        schemesResult = await classifyAndAssemble(
+          'schemes',
+          subject,
+          filterStr,
+          (frac) => { ucProgressBar.style.width = ((papersWeight + frac * (1 - papersWeight)) * 100) + '%'; }
+        );
       }
 
-      state.output = {
-        papersBlob,
-        schemesBlob,
-        paperPages: papersOut.getPageCount(),
-        schemePages,
-      };
-
-      // Wire download links
+      // Wire downloads
       if (downloadPapersLink.dataset.url) URL.revokeObjectURL(downloadPapersLink.dataset.url);
-      const papersUrl = URL.createObjectURL(papersBlob);
+      const papersUrl = URL.createObjectURL(papersResult.blob);
       downloadPapersLink.href = papersUrl;
-      downloadPapersLink.download = 'topical-questions.pdf';
+      downloadPapersLink.download = filterStr
+        ? `topical-questions-${slug(filterStr)}.pdf`
+        : 'topical-questions.pdf';
       downloadPapersLink.dataset.url = papersUrl;
-      resultPaperCount.textContent = state.output.paperPages;
+      resultPaperCount.textContent = papersResult.pageCount;
 
-      if (schemesBlob) {
+      if (schemesResult) {
         if (downloadSchemesLink.dataset.url) URL.revokeObjectURL(downloadSchemesLink.dataset.url);
-        const schemesUrl = URL.createObjectURL(schemesBlob);
+        const schemesUrl = URL.createObjectURL(schemesResult.blob);
         downloadSchemesLink.href = schemesUrl;
-        downloadSchemesLink.download = 'topical-mark-schemes.pdf';
+        downloadSchemesLink.download = filterStr
+          ? `topical-mark-schemes-${slug(filterStr)}.pdf`
+          : 'topical-mark-schemes.pdf';
         downloadSchemesLink.dataset.url = schemesUrl;
-        resultSchemeCount.textContent = schemePages;
+        resultSchemeCount.textContent = schemesResult.pageCount;
         resultSchemesRow.style.display = '';
       } else {
         resultSchemesRow.style.display = 'none';
       }
 
+      const topicSummary = `${papersResult.topicCount} topic${papersResult.topicCount === 1 ? '' : 's'}`;
+      const skipNote = papersResult.skippedCount > 0
+        ? ` · ${papersResult.skippedCount} cover/blank skipped`
+        : '';
+      setStatus(`Done — ${topicSummary} · ${papersResult.pageCount} pages${skipNote}`);
       ucResult.classList.add('active');
 
-      // Hold full bar briefly, then collapse
       setTimeout(() => {
         ucProgress.classList.remove('active');
         ucProgressBar.style.width = '0%';
-      }, 600);
+      }, 800);
 
     } catch (err) {
       console.error('Sort failed:', err);
-      alert('Something went wrong while processing the PDFs. Check the console for details.');
+      setStatus(`Error: ${err.message || 'Something went wrong'}`);
       ucProgress.classList.remove('active');
     } finally {
       btnSort.disabled = state.papers.length === 0;
@@ -1554,6 +2023,10 @@ h1.hero-title em::after {
       btnSort.querySelector('.btn-sort-label').textContent = 'Sort into topics';
     }
   });
+
+  function slug(s) {
+    return s.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '').slice(0, 40);
+  }
 
   // ===== Reveal on scroll =====
   const observer = new IntersectionObserver((entries) => {
