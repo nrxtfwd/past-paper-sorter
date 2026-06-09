@@ -244,34 +244,6 @@ main, header, footer { position: relative; z-index: 1; }
   align-items: center;
 }
 
-.eyebrow {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  padding: 6px 14px;
-  background: var(--blue-tint);
-  color: var(--blue);
-  border-radius: 999px;
-  font-size: 12px;
-  font-weight: 600;
-  letter-spacing: 0.04em;
-  margin-bottom: 28px;
-  font-family: 'JetBrains Mono', monospace;
-}
-
-.eyebrow .dot {
-  width: 6px;
-  height: 6px;
-  border-radius: 50%;
-  background: var(--blue);
-  animation: pulse 2s ease infinite;
-}
-
-@keyframes pulse {
-  0%, 100% { opacity: 1; transform: scale(1); }
-  50% { opacity: 0.5; transform: scale(0.8); }
-}
-
 h1.hero-title {
   font-family: 'Fraunces', serif;
   font-weight: 400;
@@ -300,56 +272,6 @@ h1.hero-title em::after {
   border-radius: 2px;
 }
 
-.hero-sub {
-  font-size: 19px;
-  color: var(--ink-soft);
-  margin-bottom: 36px;
-  max-width: 540px;
-  line-height: 1.6;
-}
-
-.hero-cta {
-  display: flex;
-  gap: 14px;
-  align-items: center;
-  flex-wrap: wrap;
-}
-
-.btn-ghost {
-  background: transparent;
-  color: var(--ink);
-  border: 1px solid var(--line);
-}
-
-.btn-ghost:hover {
-  border-color: var(--blue);
-  color: var(--blue);
-}
-
-.hero-stats {
-  display: flex;
-  gap: 36px;
-  margin-top: 56px;
-  padding-top: 32px;
-  border-top: 1px solid var(--line);
-}
-
-.stat strong {
-  display: block;
-  font-family: 'Fraunces', serif;
-  font-size: 32px;
-  font-weight: 500;
-  color: var(--ink);
-  letter-spacing: -0.02em;
-}
-
-.stat span {
-  font-size: 13px;
-  color: var(--ink-faint);
-  font-family: 'JetBrains Mono', monospace;
-  letter-spacing: 0.02em;
-}
-
 /* ========== HERO VISUAL (UPLOAD MOCK) ========== */
 .hero-visual {
   position: relative;
@@ -375,48 +297,6 @@ h1.hero-title em::after {
   top: 0; left: 0; right: 0;
   height: 1px;
   background: linear-gradient(90deg, transparent, var(--blue), transparent);
-}
-
-.uc-head {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 22px;
-  gap: 12px;
-  flex-wrap: wrap;
-}
-
-.uc-head h3 {
-  font-family: 'Fraunces', serif;
-  font-size: 19px;
-  font-weight: 500;
-  letter-spacing: -0.01em;
-}
-
-.uc-tabs {
-  display: flex;
-  gap: 4px;
-  background: var(--bg-soft);
-  padding: 3px;
-  border-radius: 8px;
-  font-size: 12px;
-  flex-shrink: 0;
-}
-
-.uc-tab {
-  padding: 5px 11px;
-  border-radius: 6px;
-  cursor: pointer;
-  color: var(--ink-soft);
-  font-weight: 500;
-  transition: all 0.2s;
-  white-space: nowrap;
-}
-
-.uc-tab.active {
-  background: var(--bg-elev);
-  color: var(--ink);
-  box-shadow: var(--shadow-sm);
 }
 
 .dropzone {
@@ -539,16 +419,22 @@ h1.hero-title em::after {
 [data-theme="dark"] .uc-file-status:hover { background: var(--blue-bright); }
 
 .uc-empty {
-  margin-top: 18px;
-  padding: 16px;
+  margin-top: 14px;
   text-align: center;
-  font-size: 13px;
-  color: var(--ink-faint);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
   font-family: 'JetBrains Mono', monospace;
-  border: 1px dashed var(--line);
-  border-radius: 10px;
-  background: transparent;
 }
+
+.uc-empty-spec {
+  font-size: 11px;
+  color: var(--blue);
+  font-weight: 600;
+  letter-spacing: 0.02em;
+}
+
+[data-theme="dark"] .uc-empty-spec { color: var(--blue-bright); }
 
 .uc-action {
   margin-top: 18px;
@@ -590,7 +476,7 @@ h1.hero-title em::after {
 
 [data-theme="dark"] .btn-sort.processing { color: #050b1c; }
 
-.btn-clear {
+.btn-icon {
   width: 46px;
   background: transparent;
   border: 1px solid var(--line);
@@ -601,12 +487,271 @@ h1.hero-title em::after {
   place-items: center;
   transition: all 0.2s;
   font-family: inherit;
+  flex-shrink: 0;
 }
 
-.btn-clear:hover {
+.btn-icon:hover {
+  border-color: var(--blue);
+  color: var(--blue);
+  background: var(--blue-tint);
+}
+
+#btnClear:hover {
   border-color: #d94646;
   color: #d94646;
   background: rgba(217, 70, 70, 0.06);
+}
+
+#btnSettings.active {
+  border-color: var(--blue);
+  color: var(--blue);
+  background: var(--blue-tint);
+}
+
+/* Settings panel */
+.uc-settings {
+  position: absolute;
+  top: clamp(20px, 2.4vw, 28px);
+  left: clamp(20px, 2.4vw, 28px);
+  right: clamp(20px, 2.4vw, 28px);
+  max-height: calc(100% - clamp(40px, 4.8vw, 56px));
+  z-index: 10;
+  padding: 18px;
+  background: var(--bg-elev);
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  box-shadow: var(--shadow-lg);
+  overflow-y: auto;
+  animation: settingsIn 180ms cubic-bezier(0.2, 0.8, 0.3, 1);
+}
+
+@keyframes settingsIn {
+  from { opacity: 0; transform: translateY(-4px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.uc-settings[hidden] { display: none; }
+
+.uc-settings-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--line);
+  margin-bottom: 4px;
+}
+
+.uc-settings-title {
+  font-family: 'Fraunces', serif;
+  font-size: 18px;
+  font-weight: 500;
+  letter-spacing: -0.01em;
+  color: var(--ink);
+}
+
+.uc-settings-close {
+  width: 30px;
+  height: 30px;
+  border-radius: 8px;
+  border: 1px solid var(--line);
+  background: transparent;
+  color: var(--ink-soft);
+  cursor: pointer;
+  display: grid;
+  place-items: center;
+  transition: all 0.15s;
+  font-family: inherit;
+}
+
+.uc-settings-close:hover {
+  border-color: #d94646;
+  color: #d94646;
+  background: rgba(217, 70, 70, 0.06);
+}
+
+.uc-setting-row {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.uc-setting-label {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--ink);
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.uc-setting-label em {
+  font-style: normal;
+  font-size: 11px;
+  font-weight: 400;
+  color: var(--ink-faint);
+  font-family: 'JetBrains Mono', monospace;
+  letter-spacing: 0.01em;
+}
+
+.uc-setting-input {
+  margin-top: 4px;
+  width: 100%;
+  padding: 9px 12px;
+  border: 1px solid var(--line);
+  border-radius: 9px;
+  background: var(--bg-elev);
+  color: var(--ink);
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 500;
+  outline: none;
+  transition: border-color 0.2s;
+  box-sizing: border-box;
+}
+
+.uc-setting-input:focus { border-color: var(--blue); }
+.uc-setting-input::placeholder { color: var(--ink-faint); font-weight: 400; }
+
+/* Spec dropdown + upload button row */
+.uc-spec-controls {
+  display: flex;
+  gap: 8px;
+  margin-top: 4px;
+  align-items: stretch;
+}
+
+.uc-spec-select {
+  flex: 1;
+  min-width: 0;
+  margin-top: 0;
+  appearance: none;
+  -webkit-appearance: none;
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%238693ad' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'><polyline points='6 9 12 15 18 9'/></svg>");
+  background-repeat: no-repeat;
+  background-position: right 12px center;
+  padding-right: 32px;
+  cursor: pointer;
+}
+
+.uc-spec-upload {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 0 14px;
+  border: 1px solid var(--line);
+  background: var(--bg-soft);
+  border-radius: 9px;
+  color: var(--ink);
+  font-family: inherit;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.uc-spec-upload:hover {
+  border-color: var(--blue);
+  color: var(--blue);
+  background: var(--blue-tint);
+}
+
+.uc-spec-upload:disabled {
+  opacity: 0.6;
+  cursor: wait;
+}
+
+.uc-spec-info {
+  margin-top: 8px;
+  padding: 8px 12px;
+  background: var(--blue-tint);
+  border: 1px solid color-mix(in srgb, var(--blue) 22%, transparent);
+  border-radius: 8px;
+  font-size: 11px;
+  font-family: 'JetBrains Mono', monospace;
+  color: var(--blue);
+  line-height: 1.5;
+  word-break: break-word;
+}
+
+.uc-spec-info strong { font-weight: 700; }
+.uc-spec-info .uc-spec-delete {
+  float: right;
+  background: none;
+  border: none;
+  color: var(--blue);
+  cursor: pointer;
+  font-family: inherit;
+  font-size: 11px;
+  text-decoration: underline;
+  padding: 0;
+}
+.uc-spec-info .uc-spec-delete:hover { color: #d94646; }
+
+.uc-setting-toggle {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  cursor: pointer;
+  user-select: none;
+}
+
+.uc-setting-toggle input[type="checkbox"] {
+  appearance: none;
+  -webkit-appearance: none;
+  width: 36px;
+  height: 20px;
+  background: var(--line);
+  border-radius: 99px;
+  position: relative;
+  cursor: pointer;
+  transition: background 0.2s;
+  flex-shrink: 0;
+  margin: 1px 0 0 0;
+}
+
+.uc-setting-toggle input[type="checkbox"]::before {
+  content: '';
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: 16px;
+  height: 16px;
+  background: white;
+  border-radius: 50%;
+  transition: transform 0.2s;
+  box-shadow: 0 1px 2px rgba(0,0,0,0.2);
+}
+
+.uc-setting-toggle input[type="checkbox"]:checked {
+  background: var(--blue);
+}
+
+.uc-setting-toggle input[type="checkbox"]:checked::before {
+  transform: translateX(16px);
+}
+
+.uc-setting-toggle-text {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--ink);
+  line-height: 1.35;
+}
+
+.uc-setting-toggle-text em {
+  font-style: normal;
+  font-size: 11px;
+  font-weight: 400;
+  color: var(--ink-faint);
+  font-family: 'JetBrains Mono', monospace;
+  letter-spacing: 0.01em;
 }
 
 /* Dropzone drag-over state */
@@ -650,75 +795,6 @@ h1.hero-title em::after {
   font-family: 'JetBrains Mono', monospace;
   color: var(--ink-soft);
   letter-spacing: 0.01em;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-
-.uc-status::before {
-  content: '';
-  width: 6px;
-  height: 6px;
-  border-radius: 50%;
-  background: var(--blue);
-  animation: pulse 1.4s ease infinite;
-  flex-shrink: 0;
-}
-
-.uc-options {
-  margin-top: 16px;
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-}
-
-.uc-option-row {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  background: var(--bg-soft);
-  border: 1px solid var(--line-soft);
-  border-radius: 10px;
-  padding: 9px 12px;
-  transition: border-color 0.2s;
-}
-
-.uc-option-row:focus-within {
-  border-color: var(--blue);
-}
-
-.uc-option-label {
-  font-size: 11px;
-  font-family: 'JetBrains Mono', monospace;
-  color: var(--ink-faint);
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
-  white-space: nowrap;
-  flex-shrink: 0;
-}
-
-.uc-option-label em {
-  font-style: normal;
-  text-transform: none;
-  letter-spacing: 0;
-  opacity: 0.7;
-}
-
-.uc-option-input {
-  flex: 1;
-  min-width: 0;
-  border: none;
-  background: transparent;
-  color: var(--ink);
-  font-family: inherit;
-  font-size: 13px;
-  font-weight: 500;
-  outline: none;
-}
-
-.uc-option-input::placeholder {
-  color: var(--ink-faint);
-  font-weight: 400;
 }
 
 /* Result download row */
@@ -767,207 +843,80 @@ h1.hero-title em::after {
 
 .uc-result-row a:hover { text-decoration: underline; }
 
-/* ========== SECTION ========== */
-.section {
-  max-width: 1280px;
-  margin: 0 auto;
-  padding: 100px 32px;
+/* Green topics list — shown after sorting completes */
+.uc-topics {
+  margin-top: 14px;
+  padding: 14px 16px;
+  background: rgba(34, 167, 93, 0.08);
+  border: 1px solid rgba(34, 167, 93, 0.28);
+  border-radius: 12px;
 }
 
-.section-head {
-  margin-bottom: 56px;
-  max-width: 680px;
+[data-theme="dark"] .uc-topics {
+  background: rgba(52, 199, 122, 0.10);
+  border-color: rgba(52, 199, 122, 0.32);
 }
 
-.section-tag {
-  font-family: 'JetBrains Mono', monospace;
+.uc-topics-head {
   font-size: 12px;
-  color: var(--blue);
-  letter-spacing: 0.08em;
+  font-family: 'JetBrains Mono', monospace;
+  color: #1b8a4d;
+  letter-spacing: 0.04em;
   text-transform: uppercase;
-  margin-bottom: 14px;
-}
-
-.section-head h2 {
-  font-family: 'Fraunces', serif;
-  font-size: clamp(34px, 4.4vw, 52px);
-  line-height: 1.05;
-  font-weight: 400;
-  letter-spacing: -0.025em;
-  margin-bottom: 16px;
-}
-
-.section-head h2 em { font-style: italic; color: var(--blue); }
-
-.section-head p {
-  font-size: 17px;
-  color: var(--ink-soft);
-}
-
-/* ========== HOW IT WORKS ========== */
-.steps {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 24px;
-  position: relative;
-}
-
-.step {
-  background: var(--bg-elev);
-  border: 1px solid var(--line);
-  border-radius: var(--radius-lg);
-  padding: 32px;
-  transition: all 0.3s;
-  position: relative;
-  overflow: hidden;
-}
-
-.step:hover {
-  border-color: var(--blue);
-  transform: translateY(-4px);
-  box-shadow: var(--shadow-md);
-}
-
-.step-num {
-  font-family: 'Fraunces', serif;
-  font-size: 56px;
-  font-weight: 300;
-  font-style: italic;
-  color: var(--blue);
-  line-height: 1;
-  margin-bottom: 18px;
-  letter-spacing: -0.04em;
-}
-
-.step h3 {
-  font-family: 'Fraunces', serif;
-  font-size: 22px;
-  font-weight: 500;
-  letter-spacing: -0.015em;
   margin-bottom: 10px;
+  font-weight: 600;
 }
 
-.step p {
-  font-size: 14.5px;
-  color: var(--ink-soft);
-  line-height: 1.6;
+[data-theme="dark"] .uc-topics-head {
+  color: #4ed18a;
 }
 
-.step-icon {
-  position: absolute;
-  top: 28px;
-  right: 28px;
-  width: 36px;
-  height: 36px;
-  border-radius: 10px;
-  background: var(--bg-soft);
-  display: grid;
-  place-items: center;
-  color: var(--blue);
-}
-
-/* ========== FEATURES ========== */
-.features {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 1px;
-  background: var(--line);
-  border: 1px solid var(--line);
-  border-radius: var(--radius-lg);
-  overflow: hidden;
-}
-
-.feature {
-  background: var(--bg-elev);
-  padding: 38px;
-  transition: background 0.2s;
-}
-
-.feature:hover { background: var(--bg-soft); }
-
-.feature-head {
+.uc-topics-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
   display: flex;
-  align-items: center;
-  gap: 14px;
-  margin-bottom: 14px;
+  flex-direction: column;
+  gap: 6px;
+  counter-reset: topicCounter;
 }
 
-.feature-icon {
-  width: 42px;
-  height: 42px;
-  border-radius: 11px;
-  background: linear-gradient(135deg, var(--blue-tint), var(--bg-soft));
-  border: 1px solid var(--line);
-  display: grid;
-  place-items: center;
-  color: var(--blue);
+.uc-topics-list li {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  font-size: 13.5px;
+  color: #166c3d;
+  font-weight: 500;
+  counter-increment: topicCounter;
+}
+
+[data-theme="dark"] .uc-topics-list li { color: #7adfa6; }
+
+.uc-topics-list li::before {
+  content: "Topic " counter(topicCounter) ":";
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+  font-weight: 700;
+  color: #1b8a4d;
+  flex-shrink: 0;
+  min-width: 62px;
+  letter-spacing: 0.02em;
+}
+
+[data-theme="dark"] .uc-topics-list li::before { color: #4ed18a; }
+
+.uc-topics-list .topic-count {
+  margin-left: auto;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+  color: rgba(27, 138, 77, 0.7);
+  font-weight: 500;
   flex-shrink: 0;
 }
 
-.feature h3 {
-  font-family: 'Fraunces', serif;
-  font-size: 20px;
-  font-weight: 500;
-  letter-spacing: -0.01em;
-}
-
-.feature p {
-  color: var(--ink-soft);
-  font-size: 14.5px;
-  line-height: 1.65;
-}
-
-/* ========== TOPICS PREVIEW ========== */
-.topics-section {
-  background: var(--bg-elev);
-  border: 1px solid var(--line);
-  border-radius: var(--radius-lg);
-  padding: 48px;
-  display: grid;
-  grid-template-columns: 1fr 1.2fr;
-  gap: 56px;
-  align-items: center;
-}
-
-.topics-grid {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 10px;
-}
-
-.topic-chip {
-  background: var(--bg-soft);
-  border: 1px solid var(--line-soft);
-  border-radius: 12px;
-  padding: 14px 16px;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  font-size: 14px;
-  font-weight: 500;
-  transition: all 0.2s;
-  cursor: pointer;
-}
-
-.topic-chip:hover {
-  background: var(--blue-tint);
-  border-color: var(--blue);
-  color: var(--blue);
-  transform: translateX(4px);
-}
-
-.topic-chip-count {
-  font-family: 'JetBrains Mono', monospace;
-  font-size: 11px;
-  color: var(--ink-faint);
-  background: var(--bg-elev);
-  padding: 3px 8px;
-  border-radius: 6px;
-}
-
-.topic-chip:hover .topic-chip-count {
-  color: var(--blue);
-  background: var(--bg-elev);
+[data-theme="dark"] .uc-topics-list .topic-count {
+  color: rgba(78, 209, 138, 0.7);
 }
 
 /* ========== FOOTER ========== */
@@ -1005,13 +954,8 @@ h1.hero-title em::after {
 @media (max-width: 960px) {
   .hero { padding: 56px 24px 24px; }
   .hero-grid { grid-template-columns: 1fr; gap: 48px; }
-  .section { padding: 72px 24px; }
-  .steps { grid-template-columns: 1fr; }
-  .features { grid-template-columns: 1fr; }
-  .topics-section { grid-template-columns: 1fr; padding: 32px; gap: 32px; }
   .topbar-inner { padding: 12px 20px; }
   .nav-links { display: none; }
-  .hero-stats { gap: 22px; flex-wrap: wrap; }
   .hero-visual { max-width: 520px; margin: 0 auto; }
 }
 
@@ -1019,7 +963,6 @@ h1.hero-title em::after {
   .topbar-actions .btn { display: none; }
   .footer { flex-direction: column; text-align: center; }
   .uc-file-size { display: none; }
-  .uc-head h3 { font-size: 17px; }
 }
 </style>
 </head>
@@ -1036,10 +979,6 @@ h1.hero-title em::after {
     </a>
 
     <nav class="nav-links">
-      <a href="#how">How it works</a>
-      <a href="#features">Features</a>
-      <a href="#topics">Topics</a>
-      <a href="#about">About</a>
     </nav>
 
     <div class="topbar-actions">
@@ -1061,65 +1000,24 @@ h1.hero-title em::after {
   <section class="hero">
     <div class="hero-grid">
       <div class="hero-copy">
-        <div class="eyebrow">
-          <span class="dot"></span>
-          <span>v1.0 — built for students &amp; teachers</span>
-        </div>
-
         <h1 class="hero-title">
           Past papers, <em>sorted</em><br>
           by topic. In minutes.
         </h1>
-
-        <p class="hero-sub">
-          Drop in a stack of exam papers and mark schemes. We split, classify, and stitch them back into clean topical PDFs — ready for targeted practice or focused revision sets.
-        </p>
-
-        <div class="hero-cta">
-          <a href="#sort" class="btn btn-primary">
-            Upload papers
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M17 8l-5-5-5 5M12 3v12"/></svg>
-          </a>
-          <a href="#how" class="btn btn-ghost">See how it works</a>
-        </div>
-
-        <div class="hero-stats">
-          <div class="stat">
-            <strong>~2 min</strong>
-            <span>avg sort time</span>
-          </div>
-          <div class="stat">
-            <strong>100</strong>
-            <span>files per batch</span>
-          </div>
-          <div class="stat">
-            <strong>2 PDFs</strong>
-            <span>questions + answers</span>
-          </div>
-        </div>
       </div>
 
       <div class="hero-visual">
         <div class="upload-card" id="sort">
-          <div class="uc-head">
-            <h3>New batch</h3>
-            <div class="uc-tabs">
-              <div class="uc-tab active" data-lane="papers">Papers</div>
-              <div class="uc-tab" data-lane="schemes">Mark schemes</div>
-            </div>
-          </div>
-
           <label class="dropzone" id="dropzone" for="fileInput">
             <div class="dropzone-icon">
               <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M17 8l-5-5-5 5M12 3v12"/></svg>
             </div>
             <p>Drop PDFs or .zip files here</p>
-            <small id="dropzoneHint">or click to browse — up to 100 files</small>
             <input type="file" id="fileInput" multiple style="display:none" accept=".pdf,.zip,application/pdf,application/zip">
           </label>
 
-          <div class="uc-empty" id="ucEmpty">
-            <span>No files yet — drop some PDFs above</span>
+          <div class="uc-empty" id="ucEmpty" hidden>
+            <span class="uc-empty-spec" id="ucEmptySpec" hidden></span>
           </div>
 
           <div class="uc-files" id="ucFiles" hidden></div>
@@ -1128,17 +1026,6 @@ h1.hero-title em::after {
             <div class="uc-progress-bar" id="ucProgressBar"></div>
           </div>
           <div class="uc-status" id="ucStatus" hidden></div>
-
-          <div class="uc-options" id="ucOptions">
-            <label class="uc-option-row">
-              <span class="uc-option-label">Subject</span>
-              <input type="text" id="subjectInput" class="uc-option-input" placeholder="e.g. A-Level Chemistry" value="A-Level Chemistry">
-            </label>
-            <label class="uc-option-row">
-              <span class="uc-option-label">Topic filter <em>(optional)</em></span>
-              <input type="text" id="topicFilter" class="uc-option-input" placeholder="leave blank for all topics">
-            </label>
-          </div>
 
           <div class="uc-result" id="ucResult">
             <div class="uc-result-head">// ready to download</div>
@@ -1149,13 +1036,62 @@ h1.hero-title em::after {
                 <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg>
               </a>
             </div>
-            <div class="uc-result-row" id="resultSchemesRow">
-              <span><strong>Mark schemes</strong> · <span id="resultSchemeCount">0</span> pages</span>
-              <a href="#" id="downloadSchemes">
-                Download
-                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg>
-              </a>
+          </div>
+
+          <div class="uc-topics" id="ucTopics" hidden>
+            <div class="uc-topics-head">Topics found</div>
+            <ol class="uc-topics-list" id="ucTopicsList"></ol>
+          </div>
+
+          <div class="uc-settings" id="ucSettings" hidden>
+            <div class="uc-settings-head">
+              <span class="uc-settings-title">Settings</span>
+              <button class="uc-settings-close" id="btnSettingsClose" aria-label="Close settings">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+              </button>
             </div>
+
+            <div class="uc-setting-row">
+              <label class="uc-setting-label">
+                <span>Specification</span>
+                <em>use official syllabus topic names</em>
+              </label>
+              <div class="uc-spec-controls">
+                <select id="specSelect" class="uc-setting-input uc-spec-select">
+                  <option value="">No specification</option>
+                </select>
+                <button class="uc-spec-upload" id="btnSpecUpload" type="button">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M17 8l-5-5-5 5M12 3v12"/></svg>
+                  <span>Upload</span>
+                </button>
+                <input type="file" id="specFileInput" accept=".pdf,application/pdf" style="display:none">
+              </div>
+              <div class="uc-spec-info" id="specInfo" hidden></div>
+            </div>
+
+            <div class="uc-setting-row">
+              <label class="uc-setting-label" for="topicFilterInput">
+                <span>Topics to include</span>
+                <em>comma-separated · blank = all topics</em>
+              </label>
+              <input type="text" id="topicFilterInput" class="uc-setting-input" placeholder="e.g. Algorithms, Arrays">
+            </div>
+
+            <label class="uc-setting-toggle">
+              <input type="checkbox" id="settingToc" checked>
+              <span class="uc-setting-toggle-text">
+                <span>Table of contents</span>
+                <em>clickable index page at the front (only if 2+ topics)</em>
+              </span>
+            </label>
+
+            <label class="uc-setting-toggle">
+              <input type="checkbox" id="settingHeader" checked>
+              <span class="uc-setting-toggle-text">
+                <span>Topic header on each page</span>
+                <em>show "Topic: X" at the top of every question page</em>
+              </span>
+            </label>
           </div>
 
           <div class="uc-action">
@@ -1163,143 +1099,14 @@ h1.hero-title em::after {
               <span class="btn-sort-label">Sort into topics</span>
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
             </button>
-            <button class="btn-clear" id="btnClear" hidden aria-label="Clear all files">
+            <button class="btn-icon" id="btnSettings" aria-label="Settings" aria-expanded="false">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg>
+            </button>
+            <button class="btn-icon" id="btnClear" hidden aria-label="Clear all files">
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2m3 0v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"/></svg>
             </button>
           </div>
         </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- HOW IT WORKS -->
-  <section class="section" id="how">
-    <div class="section-head reveal">
-      <div class="section-tag">// how it works</div>
-      <h2>Three steps from <em>messy stack</em> to clean topical sets.</h2>
-      <p>No accounts, no manual tagging. Just upload, wait, download.</p>
-    </div>
-
-    <div class="steps">
-      <div class="step reveal">
-        <div class="step-icon">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M17 8l-5-5-5 5M12 3v12"/></svg>
-        </div>
-        <div class="step-num">01</div>
-        <h3>Upload your stack</h3>
-        <p>Drop in past paper PDFs and (optionally) their mark schemes. Bulk uploads via .zip work too — up to 100 files at once.</p>
-      </div>
-
-      <div class="step reveal">
-        <div class="step-icon">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
-        </div>
-        <div class="step-num">02</div>
-        <h3>We classify each question</h3>
-        <p>Every question is parsed and tagged by topic. Optionally narrow down to a single topic — useful if you only need atomic structure or kinematics today.</p>
-      </div>
-
-      <div class="step reveal">
-        <div class="step-icon">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="12" y1="18" x2="12" y2="12"/><line x1="9" y1="15" x2="15" y2="15"/></svg>
-        </div>
-        <div class="step-num">03</div>
-        <h3>Download two PDFs</h3>
-        <p>One file with topical questions, another with the matching mark schemes. Properly formatted, faithful to the source, ready to print or share.</p>
-      </div>
-    </div>
-  </section>
-
-  <!-- FEATURES -->
-  <section class="section" id="features">
-    <div class="section-head reveal">
-      <div class="section-tag">// what's inside</div>
-      <h2>Built like the tools you <em>actually use</em>.</h2>
-      <p>Same friction-free feel as a background remover or audio converter — just pointed at your past paper backlog.</p>
-    </div>
-
-    <div class="features reveal">
-      <div class="feature">
-        <div class="feature-head">
-          <div class="feature-icon">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg>
-          </div>
-          <h3>Bulk &amp; .zip uploads</h3>
-        </div>
-        <p>Two clearly separated lanes — papers on one side, mark schemes on the other. Compressed archives are unpacked automatically.</p>
-      </div>
-
-      <div class="feature">
-        <div class="feature-head">
-          <div class="feature-icon">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
-          </div>
-          <h3>Topic-perfect grouping</h3>
-        </div>
-        <p>Questions are sorted into clean topical buckets so students can drill the exact area they're weakest on, instead of grinding entire papers.</p>
-      </div>
-
-      <div class="feature">
-        <div class="feature-head">
-          <div class="feature-icon">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
-          </div>
-          <h3>Results in under five minutes</h3>
-        </div>
-        <p>Most batches finish in two. Larger ones get a live progress bar so you know exactly how much longer there is to wait.</p>
-      </div>
-
-      <div class="feature">
-        <div class="feature-head">
-          <div class="feature-icon">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
-          </div>
-          <h3>Faithful to the source</h3>
-        </div>
-        <p>Question formatting, figures, and numbering are preserved. What you upload is what you get back — just resorted by topic.</p>
-      </div>
-
-      <div class="feature">
-        <div class="feature-head">
-          <div class="feature-icon">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 7h-7m0 0V0m0 7L4 19m0 0v-7m0 7h7"/><path d="M3 3h7v7H3z"/></svg>
-          </div>
-          <h3>Pick one topic — or all</h3>
-        </div>
-        <p>Just want kinematics? Filter to a single topic and skip everything else. Useful for last-minute targeted revision sets.</p>
-      </div>
-
-      <div class="feature">
-        <div class="feature-head">
-          <div class="feature-icon">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
-          </div>
-          <h3>Works on any device</h3>
-        </div>
-        <p>Designed mobile-first. Sort papers from a school computer, a phone on the bus, or a tablet at the kitchen table.</p>
-      </div>
-    </div>
-  </section>
-
-  <!-- TOPICS -->
-  <section class="section" id="topics">
-    <div class="topics-section reveal">
-      <div>
-        <div class="section-tag">// example output</div>
-        <h2 style="font-family:'Fraunces',serif;font-size:38px;font-weight:400;letter-spacing:-0.02em;line-height:1.05;margin-bottom:14px;">A peek at a sorted <em style="font-style:italic;color:var(--blue)">A-Level Chemistry</em> batch.</h2>
-        <p style="color:var(--ink-soft);font-size:16px;margin-bottom:24px;">From 12 uploaded papers — questions automatically grouped into 8 topical clusters with mark scheme counterparts.</p>
-        <a href="#sort" class="btn btn-primary">Try it with your own papers</a>
-      </div>
-
-      <div class="topics-grid">
-        <div class="topic-chip"><span>Atomic structure</span><span class="topic-chip-count">14</span></div>
-        <div class="topic-chip"><span>Bonding</span><span class="topic-chip-count">11</span></div>
-        <div class="topic-chip"><span>Energetics</span><span class="topic-chip-count">9</span></div>
-        <div class="topic-chip"><span>Kinetics</span><span class="topic-chip-count">7</span></div>
-        <div class="topic-chip"><span>Equilibria</span><span class="topic-chip-count">12</span></div>
-        <div class="topic-chip"><span>Redox</span><span class="topic-chip-count">8</span></div>
-        <div class="topic-chip"><span>Organic — alkanes</span><span class="topic-chip-count">10</span></div>
-        <div class="topic-chip"><span>Organic — alcohols</span><span class="topic-chip-count">6</span></div>
       </div>
     </div>
   </section>
@@ -1335,21 +1142,18 @@ h1.hero-title em::after {
   });
 
   // ===== State =====
-  // Two lanes — papers and mark schemes — each holding {id, name, size, file (File or {bytes,name})}
+  // Single lane — papers only
   const state = {
     papers: [],
-    schemes: [],
-    currentLane: 'papers',
     nextId: 1,
-    output: null, // {papersBlob, schemesBlob, paperPages, schemePages}
+    output: null,
   };
 
-  const MAX_FILES_PER_LANE = 100;
+  const MAX_FILES = 100;
 
   // ===== DOM =====
   const fileInput     = document.getElementById('fileInput');
   const dropzone      = document.getElementById('dropzone');
-  const dropzoneHint  = document.getElementById('dropzoneHint');
   const ucEmpty       = document.getElementById('ucEmpty');
   const ucFiles       = document.getElementById('ucFiles');
   const btnSort       = document.getElementById('btnSort');
@@ -1357,29 +1161,220 @@ h1.hero-title em::after {
   const ucProgress    = document.getElementById('ucProgress');
   const ucProgressBar = document.getElementById('ucProgressBar');
   const ucResult      = document.getElementById('ucResult');
-  const downloadPapersLink  = document.getElementById('downloadPapers');
-  const downloadSchemesLink = document.getElementById('downloadSchemes');
-  const resultPaperCount    = document.getElementById('resultPaperCount');
-  const resultSchemeCount   = document.getElementById('resultSchemeCount');
-  const resultSchemesRow    = document.getElementById('resultSchemesRow');
-  const tabs = document.querySelectorAll('.uc-tab');
+  const ucTopics      = document.getElementById('ucTopics');
+  const ucTopicsList  = document.getElementById('ucTopicsList');
+  const ucSettings    = document.getElementById('ucSettings');
+  const btnSettings   = document.getElementById('btnSettings');
+  const btnSettingsClose = document.getElementById('btnSettingsClose');
+  const topicFilterInput = document.getElementById('topicFilterInput');
+  const settingToc    = document.getElementById('settingToc');
+  const settingHeader = document.getElementById('settingHeader');
+  const downloadPapersLink = document.getElementById('downloadPapers');
+  const resultPaperCount   = document.getElementById('resultPaperCount');
+  const specSelect    = document.getElementById('specSelect');
+  const btnSpecUpload = document.getElementById('btnSpecUpload');
+  const specFileInput = document.getElementById('specFileInput');
+  const specInfo      = document.getElementById('specInfo');
+  const ucEmptySpec   = document.getElementById('ucEmptySpec');
 
-  // ===== Lane tabs =====
-  tabs.forEach(tab => {
-    tab.addEventListener('click', () => {
-      tabs.forEach(t => t.classList.remove('active'));
-      tab.classList.add('active');
-      state.currentLane = tab.dataset.lane;
-      renderFiles();
-      updateHint();
-    });
+  // ===== Specification storage layer (localStorage-backed) =====
+  // Stores extracted topic lists from uploaded syllabi so users can reuse
+  // them across sessions without re-uploading. Raw PDF bytes are NOT saved
+  // (too large for localStorage) — only the name + parsed topic list.
+  const SPEC_STORAGE_KEY    = 'topical_specs_v1';
+  const ACTIVE_SPEC_KEY     = 'topical_active_spec_v1';
+
+  function loadSpecs() {
+    try {
+      const raw = localStorage.getItem(SPEC_STORAGE_KEY);
+      return raw ? JSON.parse(raw) : [];
+    } catch (e) {
+      console.warn('Could not load specs from localStorage:', e);
+      return [];
+    }
+  }
+
+  function saveSpecs(specs) {
+    try {
+      localStorage.setItem(SPEC_STORAGE_KEY, JSON.stringify(specs));
+    } catch (e) {
+      console.warn('Could not save specs (storage full or blocked):', e);
+    }
+  }
+
+  function loadActiveSpecId() {
+    try { return localStorage.getItem(ACTIVE_SPEC_KEY) || ''; }
+    catch (e) { return ''; }
+  }
+
+  function saveActiveSpecId(id) {
+    try {
+      if (id) localStorage.setItem(ACTIVE_SPEC_KEY, id);
+      else localStorage.removeItem(ACTIVE_SPEC_KEY);
+    } catch (e) {}
+  }
+
+  let specs = loadSpecs();
+  let activeSpecId = loadActiveSpecId();
+
+  function getActiveSpec() {
+    return specs.find(s => s.id === activeSpecId) || null;
+  }
+
+  function renderSpecDropdown() {
+    // Preserve the placeholder "No specification" option
+    specSelect.innerHTML = '<option value="">No specification</option>';
+    for (const s of specs) {
+      const opt = document.createElement('option');
+      opt.value = s.id;
+      opt.textContent = s.name;
+      if (s.id === activeSpecId) opt.selected = true;
+      specSelect.appendChild(opt);
+    }
+
+    // Render spec info card (description + topics + delete)
+    const active = getActiveSpec();
+    if (active) {
+      specInfo.hidden = false;
+      const topicsPreview = active.topics.length > 6
+        ? active.topics.slice(0, 6).join(', ') + ` +${active.topics.length - 6} more`
+        : active.topics.join(', ');
+      specInfo.innerHTML = `
+        <button class="uc-spec-delete" id="btnSpecDelete" type="button">Delete</button>
+        <strong>${escapeHTML(active.name)}</strong> · ${active.topics.length} topics<br>
+        ${escapeHTML(topicsPreview)}
+      `;
+      const delBtn = document.getElementById('btnSpecDelete');
+      if (delBtn) delBtn.addEventListener('click', deleteActiveSpec);
+    } else {
+      specInfo.hidden = true;
+      specInfo.innerHTML = '';
+    }
+
+    // Update empty-state spec indicator
+    if (active) {
+      ucEmptySpec.hidden = false;
+      ucEmptySpec.textContent = `Selected Specification: ${active.name}`;
+    } else {
+      ucEmptySpec.hidden = true;
+      ucEmptySpec.textContent = '';
+    }
+    // Re-render so the empty-state container shows/hides based on spec presence
+    if (typeof renderFiles === 'function') renderFiles();
+  }
+
+  function deleteActiveSpec() {
+    if (!activeSpecId) return;
+    if (!confirm('Delete this saved specification?')) return;
+    specs = specs.filter(s => s.id !== activeSpecId);
+    activeSpecId = '';
+    saveSpecs(specs);
+    saveActiveSpecId('');
+    renderSpecDropdown();
+  }
+
+  specSelect.addEventListener('change', () => {
+    activeSpecId = specSelect.value;
+    saveActiveSpecId(activeSpecId);
+    renderSpecDropdown();
   });
 
-  function updateHint() {
-    const lane = state.currentLane === 'papers' ? 'past papers' : 'mark schemes';
-    dropzoneHint.textContent = `${lane} — PDFs or .zip · up to ${MAX_FILES_PER_LANE} files`;
+  btnSpecUpload.addEventListener('click', () => specFileInput.click());
+
+  specFileInput.addEventListener('change', async (e) => {
+    const file = e.target.files[0];
+    specFileInput.value = '';
+    if (!file) return;
+    await processSpecUpload(file);
+  });
+
+  async function processSpecUpload(file) {
+    btnSpecUpload.disabled = true;
+    btnSpecUpload.querySelector('span').textContent = 'Reading…';
+    try {
+      const bytes = new Uint8Array(await file.arrayBuffer());
+      // Extract text from every page of the spec
+      const pages = await extractPageTexts(bytes);
+      const fullText = pages.map(p => p.text).join('\n\n').slice(0, 30000);
+
+      btnSpecUpload.querySelector('span').textContent = 'Parsing…';
+
+      // Ask Claude to extract a clean topic list from the syllabus
+      const topics = await extractTopicsFromSpec(fullText, file.name);
+
+      if (topics.length === 0) {
+        throw new Error('No topics could be extracted from this document.');
+      }
+
+      // Save the spec
+      const id = 'spec_' + Date.now() + '_' + Math.random().toString(36).slice(2, 6);
+      const cleanName = file.name.replace(/\.pdf$/i, '').slice(0, 80);
+      specs.push({
+        id,
+        name: cleanName,
+        topics,
+        uploadedAt: Date.now(),
+      });
+      activeSpecId = id;
+      saveSpecs(specs);
+      saveActiveSpecId(id);
+      renderSpecDropdown();
+    } catch (err) {
+      console.error('Spec upload failed:', err);
+      alert(`Could not process specification: ${err.message || 'Unknown error'}`);
+    } finally {
+      btnSpecUpload.disabled = false;
+      btnSpecUpload.querySelector('span').textContent = 'Upload';
+    }
   }
-  updateHint();
+
+  // Ask Claude to pull a topic list out of a syllabus document
+  async function extractTopicsFromSpec(text, filename) {
+    const systemPrompt = `You will be given the text of an exam syllabus or specification document. Extract a clean ordered list of the curriculum TOPICS that students are tested on. Use the EXACT topic naming convention from the document (e.g. if it says "Chapter 12: Algorithms" or "Section 4.2 Energetics", preserve that prefix and naming). Skip metadata like assessment objectives, command words, glossaries, appendices, page numbers, and contact information. Skip nested sub-topics — only top-level topics or chapter-level headings. Reply with ONLY a JSON array of topic-name strings. No prose, no markdown.`;
+
+    const response = await fetch("https://api.anthropic.com/v1/messages", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        model: "claude-sonnet-4-20250514",
+        max_tokens: 2000,
+        system: systemPrompt,
+        messages: [{ role: "user", content: `Document: ${filename}\n\n${text}` }],
+      }),
+    });
+
+    if (!response.ok) throw new Error(`API error ${response.status}`);
+    const data = await response.json();
+    const out = data.content.map(b => b.type === 'text' ? b.text : '').join('').trim();
+    const cleaned = out.replace(/^```(?:json)?\s*/i, '').replace(/```\s*$/, '').trim();
+
+    let arr;
+    try {
+      arr = JSON.parse(cleaned);
+    } catch (e) {
+      const m = cleaned.match(/\[[\s\S]*\]/);
+      if (m) arr = JSON.parse(m[0]);
+      else throw new Error('Could not parse topic list from syllabus');
+    }
+    return arr.filter(x => typeof x === 'string' && x.trim()).map(x => x.trim());
+  }
+
+  // Initial render
+  renderSpecDropdown();
+
+  // Settings panel — overlay shown above upload card content
+  function setSettingsOpen(open) {
+    ucSettings.hidden = !open;
+    btnSettings.classList.toggle('active', open);
+    btnSettings.setAttribute('aria-expanded', String(open));
+  }
+  btnSettings.addEventListener('click', () => setSettingsOpen(ucSettings.hidden));
+  btnSettingsClose.addEventListener('click', () => setSettingsOpen(false));
+
+  // Esc key closes the settings panel
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && !ucSettings.hidden) setSettingsOpen(false);
+  });
 
   // ===== File input =====
   fileInput.addEventListener('change', async (e) => {
@@ -1421,7 +1416,6 @@ h1.hero-title em::after {
 
   // ===== Core: ingest dropped or selected files =====
   async function handleIncoming(rawFiles) {
-    const lane = state.currentLane;
     const expanded = [];
 
     for (const file of rawFiles) {
@@ -1458,10 +1452,10 @@ h1.hero-title em::after {
     }
 
     // Add to lane, respecting cap
-    const remaining = MAX_FILES_PER_LANE - state[lane].length;
+    const remaining = MAX_FILES - state.papers.length;
     const toAdd = expanded.slice(0, remaining);
     for (const f of toAdd) {
-      state[lane].push({
+      state.papers.push({
         id: state.nextId++,
         name: f.name,
         size: f.size,
@@ -1472,36 +1466,34 @@ h1.hero-title em::after {
 
     // Reset any prior output if the user added new files
     state.output = null;
-    ucResult.classList.remove('active');
+    ucResult.classList.remove('active'); ucTopics.hidden = true;
 
     renderFiles();
   }
 
-  // ===== Render the file list for the current lane =====
+  // ===== Render the file list =====
   function renderFiles() {
-    const lane = state.currentLane;
-    const files = state[lane];
+    const files = state.papers;
 
     ucFiles.innerHTML = '';
 
     if (files.length === 0) {
-      ucEmpty.hidden = false;
+      // Only show the empty-state container if it actually has something
+      // to display (the spec indicator). Otherwise hide it.
+      ucEmpty.hidden = ucEmptySpec.hidden;
       ucFiles.hidden = true;
-      ucEmpty.querySelector('span').textContent = state.currentLane === 'papers'
-        ? 'No papers yet — drop PDFs above'
-        : 'No mark schemes yet — drop PDFs above (optional)';
     } else {
       ucEmpty.hidden = true;
       ucFiles.hidden = false;
       for (const f of files) {
-        ucFiles.appendChild(buildFileRow(f, lane));
+        ucFiles.appendChild(buildFileRow(f));
       }
     }
 
     updateButtons();
   }
 
-  function buildFileRow(f, lane) {
+  function buildFileRow(f) {
     const row = document.createElement('div');
     row.className = 'uc-file';
     row.innerHTML = `
@@ -1513,9 +1505,9 @@ h1.hero-title em::after {
       </button>
     `;
     row.querySelector('.uc-file-status').addEventListener('click', () => {
-      state[lane] = state[lane].filter(x => x.id !== f.id);
+      state.papers = state.papers.filter(x => x.id !== f.id);
       state.output = null;
-      ucResult.classList.remove('active');
+      ucResult.classList.remove('active'); ucTopics.hidden = true;
       renderFiles();
     });
     return row;
@@ -1532,17 +1524,15 @@ h1.hero-title em::after {
   }
 
   function updateButtons() {
-    const total = state.papers.length + state.schemes.length;
     btnSort.disabled = state.papers.length === 0;
-    btnClear.hidden = total === 0;
+    btnClear.hidden = state.papers.length === 0;
   }
 
   // ===== Clear all =====
   btnClear.addEventListener('click', () => {
     state.papers = [];
-    state.schemes = [];
     state.output = null;
-    ucResult.classList.remove('active');
+    ucResult.classList.remove('active'); ucTopics.hidden = true;
     ucProgress.classList.remove('active');
     ucProgressBar.style.width = '0%';
     setStatus('');
@@ -1550,9 +1540,7 @@ h1.hero-title em::after {
   });
 
   // ===== DOM (additions for backend) =====
-  const ucStatus     = document.getElementById('ucStatus');
-  const subjectInput = document.getElementById('subjectInput');
-  const topicFilter  = document.getElementById('topicFilter');
+  const ucStatus = document.getElementById('ucStatus');
 
   function setStatus(text) {
     if (!text) { ucStatus.hidden = true; return; }
@@ -1581,10 +1569,77 @@ h1.hero-title em::after {
     return out;
   }
 
+  // ===== Relevance check =====
+  // Determines whether a given PDF is an exam question paper that should
+  // be classified, vs. an irrelevant document (textbook chapter, syllabus,
+  // mark scheme used as paper, unrelated PDF). Samples a few representative
+  // pages so the prompt stays small even for 100+ page docs.
+  async function isQuestionPaper(pages, filename) {
+    if (pages.length === 0) return false;
+
+    // Sample up to 4 pages spread across the document
+    const samples = [];
+    const indices = pages.length <= 4
+      ? pages.map((_, i) => i)
+      : [
+          Math.floor(pages.length * 0.1),
+          Math.floor(pages.length * 0.35),
+          Math.floor(pages.length * 0.6),
+          Math.floor(pages.length * 0.85),
+        ];
+    for (const i of indices) {
+      const text = (pages[i].text || '').slice(0, 900);
+      samples.push({ page: i + 1, text });
+    }
+
+    const systemPrompt = `You determine whether a PDF is an exam QUESTION PAPER (the kind students answer questions on) — as opposed to other documents like textbooks, revision notes, syllabi/specifications, mark schemes (answer keys), examiner reports, formula booklets, or unrelated content.
+
+Reply with ONLY a JSON object: {"isQuestionPaper": true|false, "kind": "<short description>"}.
+
+A question paper has: numbered questions, instruction wording like "Answer all questions" / "Show your working" / "Total marks" / "[2 marks]", question stems followed by space to answer, exam board headers (AQA, Edexcel, OCR, CIE, IB, etc.) with paper codes, candidate detail boxes.
+
+NOT a question paper: chapter headings followed by explanatory paragraphs (textbook), numbered topics with assessment objectives (syllabus), worked answers with mark allocations like "B1, M1, A1" (mark scheme), commentary on candidate performance (examiner report).
+
+No prose, no markdown, no code fences.`;
+
+    const userMsg = `Filename: ${filename}\n\nSample pages:\n${JSON.stringify(samples)}`;
+
+    try {
+      const response = await fetch("https://api.anthropic.com/v1/messages", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          model: "claude-sonnet-4-20250514",
+          max_tokens: 200,
+          system: systemPrompt,
+          messages: [{ role: "user", content: userMsg }],
+        }),
+      });
+      if (!response.ok) throw new Error(`API ${response.status}`);
+      const data = await response.json();
+      const text = data.content.map(b => b.type === 'text' ? b.text : '').join('').trim();
+      const cleaned = text.replace(/^```(?:json)?\s*/i, '').replace(/```\s*$/, '').trim();
+      let parsed;
+      try {
+        parsed = JSON.parse(cleaned);
+      } catch (e) {
+        const m = cleaned.match(/\{[\s\S]*\}/);
+        if (m) parsed = JSON.parse(m[0]);
+        else throw e;
+      }
+      return parsed.isQuestionPaper === true;
+    } catch (err) {
+      // If the check itself fails, fall back to processing — better to
+      // include than silently drop a real paper because of an API hiccup.
+      console.warn('Relevance check failed for', filename, '— defaulting to relevant:', err);
+      return true;
+    }
+  }
+
   // ===== Classify pages with Claude =====
   // Sends a batch of page texts and asks for {pageIndex -> topic}.
   // Truncates text per page to keep prompts reasonable.
-  async function classifyBatch(pages, subject) {
+  async function classifyBatch(pages, subject, specTopics) {
     const PER_PAGE_CHAR_LIMIT = 1200;
     const compact = pages.map(p => ({
       i: p.globalIndex,
@@ -1593,14 +1648,34 @@ h1.hero-title em::after {
       t: (p.text || '').slice(0, PER_PAGE_CHAR_LIMIT),
     }));
 
-    const systemPrompt = `You are a past-paper question classifier for ${subject}. For EACH page given, identify the single best-fitting curriculum topic. Use canonical topic names from the standard ${subject} syllabus (concise — 2-4 words, e.g. "Atomic Structure", "Alcohols", "Kinematics", "Proof", "Differentiation").
+    let topicGuidance;
+    if (specTopics && specTopics.length > 0) {
+      // When a syllabus is selected, force the classifier to choose from its
+      // exact topic names. This is what makes the output use names like
+      // "Chapter 12: Algorithms" instead of generic "Algorithms".
+      topicGuidance = `You MUST choose each topic from this exact list of curriculum topics, using the EXACT naming including any chapter/section numbers and prefixes:
 
-Use the SPECIAL topic "Skip" for any page that should not appear in the output:
-- Cover/title pages (subject code, candidate number boxes, exam board branding)
-- Instructions/rubric pages ("Answer all questions", "Calculators allowed", etc.)
-- Formula sheets, periodic tables, data booklets
-- Pages that are essentially blank answer space with no actual question content (very low character count, mostly answer lines)
-- Continuation pages that are purely lined answer space with no question text
+${JSON.stringify(specTopics, null, 2)}
+
+If a page genuinely doesn't fit any topic on this list, use "Other" — do NOT invent new topic names.`;
+    } else {
+      topicGuidance = `Use canonical topic names from the standard ${subject} syllabus (concise — 2-4 words, e.g. "Atomic Structure", "Alcohols", "Kinematics", "Proof", "Differentiation").`;
+    }
+
+    const systemPrompt = `You are a past-paper question classifier for ${subject}. For EACH page given, identify the single best-fitting curriculum topic.
+
+${topicGuidance}
+
+Use the SPECIAL topic "Skip" for any page that should not appear in the output. Be GENEROUS in marking pages as Skip — when in doubt, prefer Skip over keeping a low-content page. Skip:
+- Cover/title pages (subject code, candidate number boxes, exam board branding, "Surname:", "Other names:", time allowed, total marks)
+- Instructions/rubric pages ("Answer all questions", "Calculators allowed", "Show your working", "Read each question carefully")
+- Formula sheets, periodic tables, data booklets, constants tables
+- Pages where the "len" field is under 300 — these are almost always blank or answer-space pages, not real question pages
+- Pages whose text is mostly question numbers, marks notations like "[3 marks]" / "(Total for question 1 = 5 marks)", or phrases like "Continue your answer here" / "(extra answer space)" / "BLANK PAGE" with little or no actual question content
+- Continuation pages or lined answer space following a question
+- Inside-cover or back-cover pages with copyright/legal text only
+
+ONLY assign a real topic to pages that clearly contain a substantive question stem (the actual prompt the student is being asked about). If you can't identify what the student is being asked to do on a page, that page is Skip.
 
 If a page genuinely contains questions from multiple topics, pick the dominant one. Reply with ONLY a JSON array of objects: [{"i": <pageIndex>, "topic": "<topic name>"}]. No prose, no markdown, no code fences.`;
 
@@ -1649,14 +1724,24 @@ If a page genuinely contains questions from multiple topics, pick the dominant o
   // After classification, raw topics may have variants like
   // "Alcohols" / "Organic — Alcohols" / "Organic Chemistry: Alcohols".
   // We ask Claude to map them all to canonical names.
-  async function consolidateTopics(rawTopics, subject) {
-    if (rawTopics.length <= 1) {
+  // When a spec is provided, canonical names are forced to come from the spec.
+  async function consolidateTopics(rawTopics, subject, specTopics) {
+    if (rawTopics.length <= 1 && (!specTopics || specTopics.length === 0)) {
       const m = {};
       rawTopics.forEach(t => m[t] = t);
       return m;
     }
 
-    const systemPrompt = `You are organizing topic labels for ${subject} past papers. You'll receive a list of raw topic names from an earlier classification step. Some are duplicates phrased differently (e.g. "Alcohols" vs "Organic Chemistry: Alcohols"). Group them into canonical curriculum-aligned topic names — concise (2-4 words). Reply with ONLY a JSON object mapping each raw input to its canonical name. Example: {"Alcohols": "Alcohols", "Organic Chemistry: Alcohols": "Alcohols"}. No prose, no markdown, no code fences.`;
+    let systemPrompt;
+    if (specTopics && specTopics.length > 0) {
+      systemPrompt = `You are mapping raw topic labels to OFFICIAL syllabus topic names. You will receive (a) the list of official curriculum topics from a specific syllabus, and (b) a list of raw topic labels produced by an earlier classification step. For each raw label, map it to the closest matching official topic (using exact official naming including any "Chapter X:" or section prefixes). If a raw label genuinely doesn't map to any official topic, keep it unchanged. Reply with ONLY a JSON object mapping each raw input to its official name. No prose, no markdown, no code fences.`;
+    } else {
+      systemPrompt = `You are organizing topic labels for ${subject} past papers. You'll receive a list of raw topic names from an earlier classification step. Some are duplicates phrased differently (e.g. "Alcohols" vs "Organic Chemistry: Alcohols"). Group them into canonical curriculum-aligned topic names — concise (2-4 words). Reply with ONLY a JSON object mapping each raw input to its canonical name. Example: {"Alcohols": "Alcohols", "Organic Chemistry: Alcohols": "Alcohols"}. No prose, no markdown, no code fences.`;
+    }
+
+    const userContent = specTopics && specTopics.length > 0
+      ? `Official syllabus topics:\n${JSON.stringify(specTopics)}\n\nRaw topics to map:\n${JSON.stringify(rawTopics)}`
+      : `Raw topics:\n${JSON.stringify(rawTopics)}`;
 
     const response = await fetch("https://api.anthropic.com/v1/messages", {
       method: "POST",
@@ -1665,7 +1750,7 @@ If a page genuinely contains questions from multiple topics, pick the dominant o
         model: "claude-sonnet-4-20250514",
         max_tokens: 2000,
         system: systemPrompt,
-        messages: [{ role: "user", content: `Raw topics:\n${JSON.stringify(rawTopics)}` }],
+        messages: [{ role: "user", content: userContent }],
       }),
     });
 
@@ -1700,18 +1785,40 @@ If a page genuinely contains questions from multiple topics, pick the dominant o
   }
 
   // ===== Main: classify + reorder =====
-  async function classifyAndAssemble(lane, subject, topicFilterStr, onProgress) {
+  async function classifyAndAssemble(lane, subject, topicFilterStr, options, onProgress) {
+    const { showHeader = true, showToc = true, spec = null } = options || {};
+    const specTopics = spec ? spec.topics : null;
     // 1. Extract text from every page across every file in this lane
     setStatus(`Reading ${lane === 'papers' ? 'papers' : 'mark schemes'}…`);
 
-    const allPages = []; // { fileIdx, pageIdx, text, globalIndex, sourceBytes }
+    const allPages = []; // { fileIdx, pageIdx, text, globalIndex }
     let globalIndex = 0;
     const files = state[lane];
+    const irrelevantFiles = []; // names of files we skipped entirely
+
+    // Threshold: pages with less than this many chars of extractable text are
+    // almost certainly blank answer-space, diagram-only, or otherwise not
+    // worth running classification on. Pre-filtered as "Skip" without an
+    // API call — saves tokens and prevents blank pages reaching the output.
+    const MIN_PAGE_CHARS = 80;
 
     for (let fIdx = 0; fIdx < files.length; fIdx++) {
       const f = files[fIdx];
+      setStatus(`Reading file ${fIdx + 1} of ${files.length}…`);
       try {
         const pages = await extractPageTexts(f.bytes);
+
+        // 1a. Per-file relevance check: is this a question paper at all?
+        // If the file looks like a textbook, syllabus, mark scheme, or
+        // unrelated document, skip every page in it.
+        const relevant = await isQuestionPaper(pages, f.name);
+        if (!relevant) {
+          irrelevantFiles.push(f.name);
+          console.log('Skipped (not a question paper):', f.name);
+          onProgress((fIdx + 1) / files.length * 0.3);
+          continue;
+        }
+
         for (const p of pages) {
           allPages.push({
             fileIdx: fIdx,
@@ -1727,22 +1834,41 @@ If a page genuinely contains questions from multiple topics, pick the dominant o
     }
 
     if (allPages.length === 0) {
+      if (irrelevantFiles.length > 0) {
+        throw new Error(`No question papers found. ${irrelevantFiles.length} file(s) looked like other content (textbooks, syllabi, etc.) and were skipped.`);
+      }
       throw new Error('No readable pages found.');
     }
 
-    // 2. Classify in batches
-    setStatus(`Classifying ${allPages.length} pages with AI…`);
+    // 1b. Pre-filter blank/low-content pages — skip them locally without
+    // burning API calls. The pre-filter is conservative (low threshold)
+    // so question pages with short text still go through classification.
+    const preSkipped = new Set();
+    const pagesToClassify = [];
+    for (const p of allPages) {
+      if ((p.text || '').trim().length < MIN_PAGE_CHARS) {
+        preSkipped.add(p.globalIndex);
+      } else {
+        pagesToClassify.push(p);
+      }
+    }
+
+    // 2. Classify in batches (only pages with enough text)
+    setStatus(`Classifying ${pagesToClassify.length} pages with AI…`);
     const BATCH_SIZE = 12;
     const topicMap = {}; // globalIndex -> topic
+    // Pre-skipped pages get marked Skip directly
+    for (const idx of preSkipped) topicMap[idx] = 'Skip';
+
     const batches = [];
-    for (let i = 0; i < allPages.length; i += BATCH_SIZE) {
-      batches.push(allPages.slice(i, i + BATCH_SIZE));
+    for (let i = 0; i < pagesToClassify.length; i += BATCH_SIZE) {
+      batches.push(pagesToClassify.slice(i, i + BATCH_SIZE));
     }
 
     for (let bIdx = 0; bIdx < batches.length; bIdx++) {
       const batch = batches[bIdx];
       try {
-        const map = await classifyBatch(batch, subject);
+        const map = await classifyBatch(batch, subject, specTopics);
         Object.assign(topicMap, map);
       } catch (err) {
         console.warn('Batch classification failed, marking pages Unsorted:', err);
@@ -1751,9 +1877,14 @@ If a page genuinely contains questions from multiple topics, pick the dominant o
       onProgress(0.3 + ((bIdx + 1) / batches.length) * 0.5); // 30–80% for classify
     }
 
-    // 3. Filter out Skip pages and apply topic filter
+    // 3. Filter out Skip pages
     setStatus('Grouping by topic…');
-    const filterNorm = topicFilterStr ? normalizeTopic(topicFilterStr) : null;
+
+    // Parse topic filter — comma-separated list of topics user wants in output.
+    // Empty = all topics. Each entry is matched against canonical topic names below.
+    const filterList = topicFilterStr
+      ? topicFilterStr.split(',').map(s => normalizeTopic(s)).filter(Boolean)
+      : [];
 
     const SKIP_TOPICS = new Set(['skip', 'front matter', 'unsorted']);
     const keptPages = [];
@@ -1762,25 +1893,22 @@ If a page genuinely contains questions from multiple topics, pick the dominant o
       const topic = (topicMap[page.globalIndex] || 'Unsorted').trim();
       const norm = normalizeTopic(topic);
       if (SKIP_TOPICS.has(norm)) { skippedCount++; continue; }
-      if (filterNorm && !norm.includes(filterNorm)) continue;
       keptPages.push({ ...page, rawTopic: topic });
     }
 
     if (keptPages.length === 0) {
-      throw new Error(filterNorm
-        ? `No pages matched topic filter "${topicFilterStr}".`
-        : 'No content pages were classified.');
+      throw new Error('No content pages were classified.');
     }
 
-    // 3b. Consolidate similar topic names into canonical buckets.
-    // This is the step that makes "Alcohols", "Organic — Alcohols", and
-    // "Organic Chemistry: Alcohols" all collapse into one section.
+    // 3b. Consolidate similar topic names into canonical buckets BEFORE filtering.
+    // This means "Sorting Algorithms" and "Algorithms" merge first, so a user
+    // filter for "Algorithms" will match the consolidated bucket.
     let canonicalMap = {};
     const uniqueRaw = [...new Set(keptPages.map(p => p.rawTopic))];
-    if (!filterNorm && uniqueRaw.length > 1) {
+    if (uniqueRaw.length > 1 || specTopics) {
       setStatus('Consolidating topics…');
       try {
-        canonicalMap = await consolidateTopics(uniqueRaw, subject);
+        canonicalMap = await consolidateTopics(uniqueRaw, subject, specTopics);
       } catch (err) {
         console.warn('Consolidation failed, using raw topics:', err);
         for (const t of uniqueRaw) canonicalMap[t] = t;
@@ -1789,12 +1917,24 @@ If a page genuinely contains questions from multiple topics, pick the dominant o
       for (const t of uniqueRaw) canonicalMap[t] = t;
     }
 
-    // 3c. Build groups using canonical names
+    // 3c. Build groups using canonical names, applying the topic filter
     const groups = new Map();
     for (const p of keptPages) {
       const canon = canonicalMap[p.rawTopic] || p.rawTopic;
+      if (filterList.length > 0) {
+        const canonNorm = normalizeTopic(canon);
+        // Match if any user filter word/phrase is found in the canonical name
+        // (substring match either direction — handles "algo" -> "Algorithms"
+        // and "Sorting Algorithms" -> "Algorithms")
+        const matches = filterList.some(f => canonNorm.includes(f) || f.includes(canonNorm));
+        if (!matches) continue;
+      }
       if (!groups.has(canon)) groups.set(canon, []);
       groups.get(canon).push(p);
+    }
+
+    if (groups.size === 0) {
+      throw new Error(`None of your requested topics (${topicFilterStr}) were found in the uploaded papers.`);
     }
 
     // 4. Build the output PDF: one section per topic
@@ -1803,7 +1943,6 @@ If a page genuinely contains questions from multiple topics, pick the dominant o
 
     // Embed fonts once for all divider pages
     const helvBold = await outDoc.embedFont(PDFLib.StandardFonts.HelveticaBold);
-    const helv = await outDoc.embedFont(PDFLib.StandardFonts.Helvetica);
 
     // Pre-load each source PDF once (avoid reloading per page)
     const sourceDocs = [];
@@ -1816,16 +1955,41 @@ If a page genuinely contains questions from multiple topics, pick the dominant o
       }
     }
 
-    // Order topics by size (biggest first) so the most common topics appear up front.
-    // Falls back to alphabetical for ties.
-    const sortedTopics = [...groups.keys()].sort((a, b) => {
-      const diff = groups.get(b).length - groups.get(a).length;
-      return diff !== 0 ? diff : a.localeCompare(b);
-    });
+    // Topic ordering:
+    // - If a spec is active, follow the spec's order (Chapter 1, 2, 3...) so
+    //   the output mirrors the syllabus structure.
+    // - Otherwise, biggest topic first, then alphabetical for ties.
+    let sortedTopics;
+    if (specTopics && specTopics.length > 0) {
+      const specIndex = new Map(specTopics.map((t, i) => [t, i]));
+      sortedTopics = [...groups.keys()].sort((a, b) => {
+        const ai = specIndex.has(a) ? specIndex.get(a) : Number.MAX_SAFE_INTEGER;
+        const bi = specIndex.has(b) ? specIndex.get(b) : Number.MAX_SAFE_INTEGER;
+        if (ai !== bi) return ai - bi;
+        return a.localeCompare(b); // ties (e.g. "Other" topics)
+      });
+    } else {
+      sortedTopics = [...groups.keys()].sort((a, b) => {
+        const diff = groups.get(b).length - groups.get(a).length;
+        return diff !== 0 ? diff : a.localeCompare(b);
+      });
+    }
 
+    // Decide whether the TOC is shown — only worthwhile if there are 2+ topics
+    const includeToc = showToc && sortedTopics.length >= 2;
+
+    // Reserve the first page for the TOC (we add the actual page at the end so
+    // we know all the destination page references). For now we just note its index.
+    const tocPageIndex = includeToc ? 0 : -1;
+    const firstContentIndex = includeToc ? 1 : 0;
+
+    // Track which page each topic starts on (in the OUTPUT doc), used for TOC links.
+    // pageRefs[i] holds the topic's first page reference once added.
+    const topicStartIndices = []; // index into outDoc.getPages() AFTER assembly
+
+    let pageCursor = firstContentIndex;
     for (const topic of sortedTopics) {
-      // Add a clear topic heading page
-      addDividerPage(outDoc, topic, groups.get(topic).length, helvBold, helv);
+      topicStartIndices.push(pageCursor);
 
       // Append pages from this topic, grouped by source file (preserves
       // question continuity within the same paper)
@@ -1841,11 +2005,21 @@ If a page genuinely contains questions from multiple topics, pick the dominant o
         const indices = pagesByFile[fIdx].sort((a, b) => a - b);
         try {
           const copied = await outDoc.copyPages(src, indices);
-          copied.forEach(p => outDoc.addPage(p));
+          copied.forEach(p => {
+            outDoc.addPage(p);
+            pageCursor++;
+            // Stamp the topic header strip if the setting is on
+            if (showHeader) drawTopicHeader(p, topic, helvBold);
+          });
         } catch (err) {
           console.warn('copyPages failed:', err);
         }
       }
+    }
+
+    // 4b. Insert TOC page at the front (if enabled and 2+ topics)
+    if (includeToc) {
+      addTocPage(outDoc, sortedTopics, groups, topicStartIndices, helvBold);
     }
 
     onProgress(0.95);
@@ -1857,156 +2031,250 @@ If a page genuinely contains questions from multiple topics, pick the dominant o
       pageCount: outDoc.getPageCount(),
       topicCount: sortedTopics.length,
       skippedCount,
+      irrelevantFiles,
+      topics: sortedTopics.map(t => ({ name: t, count: groups.get(t).length })),
     };
   }
 
-  // Build a divider page with a clear topic heading at the top.
-  // Format: "Topic: Proof" prominently at the top, count below, plus a
-  // page-spanning blue band so it's obvious where one section ends.
-  function addDividerPage(doc, topic, count, fontBold, fontReg) {
-    const page = doc.addPage([595.28, 841.89]); // A4 portrait
-    const { width, height } = page.getSize();
-    const blue = PDFLib.rgb(0.114, 0.306, 0.847);
-    const inkSoft = PDFLib.rgb(0.4, 0.45, 0.55);
-    const inkFaint = PDFLib.rgb(0.6, 0.65, 0.72);
+  // Stamp a topic header at the top of an existing page.
+  // Uses the page's CropBox (not MediaBox) so the header stays inside
+  // the actually-visible area on PDFs that have a print/binding crop.
+  function drawTopicHeader(page, topic, fontBold) {
+    const black = PDFLib.rgb(0, 0, 0);
+    const white = PDFLib.rgb(1, 1, 1);
 
-    // Top blue band (visual separator that's instantly recognizable when
-    // scrolling through the PDF)
+    // CropBox = the visible region. Falls back to MediaBox if absent.
+    let box;
+    try {
+      box = page.getCropBox();
+    } catch (e) {
+      const s = page.getSize();
+      box = { x: 0, y: 0, width: s.width, height: s.height };
+    }
+
+    const fontSize = 11;
+    const label = `Topic: ${topic}`;
+    const textWidth = fontBold.widthOfTextAtSize(label, fontSize);
+
+    // Print-friendly: white pill with a thin black border and black text.
+    const padX = 12;
+    const padY = 5;
+    const boxW = textWidth + padX * 2;
+    const boxH = fontSize + padY * 2;
+    const boxX = box.x + (box.width - boxW) / 2;
+    const boxY = box.y + box.height - boxH - 12;
+
     page.drawRectangle({
-      x: 0,
-      y: height - 8,
-      width: width,
-      height: 8,
-      color: blue,
+      x: boxX,
+      y: boxY,
+      width: boxW,
+      height: boxH,
+      color: white,
+      borderColor: black,
+      borderWidth: 0.75,
     });
 
-    // Eyebrow label "TOPIC"
-    page.drawText('TOPIC', {
-      x: 60,
-      y: height - 130,
-      size: 11,
+    page.drawText(label, {
+      x: boxX + padX,
+      y: boxY + padY,
+      size: fontSize,
       font: fontBold,
-      color: blue,
-    });
-
-    // Big topic name — "Topic: Proof" style heading
-    const headingText = `Topic: ${topic}`;
-    const headingSize = chooseHeadingSize(headingText, fontBold, width - 120);
-    page.drawText(headingText, {
-      x: 60,
-      y: height - 180,
-      size: headingSize,
-      font: fontBold,
-      color: PDFLib.rgb(0.04, 0.09, 0.2),
-    });
-
-    // Underline accent
-    page.drawRectangle({
-      x: 60,
-      y: height - 200,
-      width: 90,
-      height: 3,
-      color: blue,
-    });
-
-    // Count
-    page.drawText(
-      `${count} question page${count === 1 ? '' : 's'} from this topic follow.`,
-      {
-        x: 60,
-        y: height - 230,
-        size: 13,
-        font: fontReg,
-        color: inkSoft,
-      }
-    );
-
-    // Footer
-    page.drawText('topical · sorted by AI', {
-      x: 60,
-      y: 40,
-      size: 9,
-      font: fontReg,
-      color: inkFaint,
+      color: black,
     });
   }
 
-  // Pick a heading font size that fits within a max width.
-  function chooseHeadingSize(text, font, maxWidth) {
-    const candidates = [42, 36, 32, 28, 24, 20];
-    for (const size of candidates) {
-      if (font.widthOfTextAtSize(text, size) <= maxWidth) return size;
+  // Insert a TOC page at the front of the document with clickable links to each topic.
+  // topicStartIndices: index of each topic's first page assuming TOC is at index 0.
+  // (Caller has already accounted for this — they assumed TOC reserves index 0.)
+  function addTocPage(doc, topics, groups, topicStartIndices, fontBold) {
+    const { PDFName, PDFArray, rgb } = PDFLib;
+
+    // Insert at position 0 so it becomes the first page
+    const tocPage = doc.insertPage(0, [595.28, 841.89]); // A4 portrait
+    const { width, height } = tocPage.getSize();
+
+    const black = rgb(0, 0, 0);
+
+    // Heading
+    tocPage.drawText('Table of Contents', {
+      x: 60,
+      y: height - 90,
+      size: 26,
+      font: fontBold,
+      color: black,
+    });
+
+    // Subtitle
+    tocPage.drawText(`${topics.length} topics · click any entry to jump to that section`, {
+      x: 60,
+      y: height - 115,
+      size: 11,
+      font: fontBold,
+      color: black,
+    });
+
+    // Underline accent — black
+    tocPage.drawRectangle({
+      x: 60,
+      y: height - 130,
+      width: 50,
+      height: 1.5,
+      color: black,
+    });
+
+    const entryFontSize = 13;
+    const entryLineHeight = 28;
+    let y = height - 175;
+
+    // Get destination page references — pages now include the freshly-inserted TOC,
+    // so destination indices are exactly topicStartIndices (TOC is index 0).
+    const allPages = doc.getPages();
+
+    for (let i = 0; i < topics.length; i++) {
+      const topicName = topics[i];
+      const count = groups.get(topicName).length;
+      const destPageIndex = topicStartIndices[i];
+      const destPage = allPages[destPageIndex];
+
+      const label = `Topic ${i + 1}: ${topicName}`;
+      const countLabel = `${count} page${count === 1 ? '' : 's'}`;
+
+      // Draw label (left) — black text
+      tocPage.drawText(label, {
+        x: 60,
+        y: y,
+        size: entryFontSize,
+        font: fontBold,
+        color: black,
+      });
+
+      // Underline the label to signal it's clickable, since color is gone
+      const labelWidth = fontBold.widthOfTextAtSize(label, entryFontSize);
+      tocPage.drawRectangle({
+        x: 60,
+        y: y - 2,
+        width: labelWidth,
+        height: 0.6,
+        color: black,
+      });
+
+      // Draw count (right) — black text
+      const countWidth = fontBold.widthOfTextAtSize(countLabel, 11);
+      tocPage.drawText(countLabel, {
+        x: width - 60 - countWidth,
+        y: y + 1,
+        size: 11,
+        font: fontBold,
+        color: black,
+      });
+
+      // Add a clickable link annotation that covers the entire row
+      const linkRect = [
+        60,
+        y - 4,
+        60 + labelWidth + 8,
+        y + entryFontSize + 4,
+      ];
+
+      try {
+        const annot = doc.context.obj({
+          Type: 'Annot',
+          Subtype: 'Link',
+          Rect: linkRect,
+          Border: [0, 0, 0],
+          A: {
+            Type: 'Action',
+            S: 'GoTo',
+            D: [destPage.ref, 'Fit'],
+          },
+        });
+        const annotRef = doc.context.register(annot);
+
+        const existingAnnots = tocPage.node.lookup(PDFName.of('Annots'));
+        if (existingAnnots && existingAnnots instanceof PDFArray) {
+          existingAnnots.push(annotRef);
+        } else {
+          tocPage.node.set(PDFName.of('Annots'), doc.context.obj([annotRef]));
+        }
+      } catch (err) {
+        console.warn('Could not create TOC link for', topicName, err);
+      }
+
+      y -= entryLineHeight;
+      if (y < 80) break;
     }
-    return 18;
+
+    // Footer — black
+    tocPage.drawText('topical · sorted by AI', {
+      x: 60,
+      y: 40,
+      size: 9,
+      font: fontBold,
+      color: black,
+    });
   }
 
   // ===== Sort: full pipeline =====
   btnSort.addEventListener('click', async () => {
     if (state.papers.length === 0) return;
 
-    const subject = (subjectInput.value || 'past papers').trim();
-    const filterStr = (topicFilter.value || '').trim();
+    // Read settings from the panel
+    const subject = 'the relevant subject';
+    const filterStr = (topicFilterInput.value || '').trim();
+    const showHeader = settingHeader.checked;
+    const showToc = settingToc.checked;
+    const spec = getActiveSpec();
 
     btnSort.disabled = true;
     btnSort.classList.add('processing');
     btnSort.querySelector('.btn-sort-label').textContent = 'Processing…';
     ucProgress.classList.add('active');
-    ucResult.classList.remove('active');
+    ucResult.classList.remove('active'); ucTopics.hidden = true;
     ucProgressBar.style.width = '0%';
-    setStatus('Starting…');
+    setStatus(spec ? `Starting (using "${spec.name}")…` : 'Starting…');
 
     try {
-      // Papers = 0–60% of total progress, schemes = 60–100%
-      const hasSchemes = state.schemes.length > 0;
-      const papersWeight = hasSchemes ? 0.6 : 1.0;
-
       const papersResult = await classifyAndAssemble(
         'papers',
         subject,
         filterStr,
-        (frac) => { ucProgressBar.style.width = (frac * papersWeight * 100) + '%'; }
+        { showHeader, showToc, spec },
+        (frac) => { ucProgressBar.style.width = (frac * 100) + '%'; }
       );
 
-      let schemesResult = null;
-      if (hasSchemes) {
-        schemesResult = await classifyAndAssemble(
-          'schemes',
-          subject,
-          filterStr,
-          (frac) => { ucProgressBar.style.width = ((papersWeight + frac * (1 - papersWeight)) * 100) + '%'; }
-        );
-      }
-
-      // Wire downloads
+      // Wire download
       if (downloadPapersLink.dataset.url) URL.revokeObjectURL(downloadPapersLink.dataset.url);
       const papersUrl = URL.createObjectURL(papersResult.blob);
       downloadPapersLink.href = papersUrl;
-      downloadPapersLink.download = filterStr
-        ? `topical-questions-${slug(filterStr)}.pdf`
-        : 'topical-questions.pdf';
+      downloadPapersLink.download = 'topical-questions.pdf';
       downloadPapersLink.dataset.url = papersUrl;
       resultPaperCount.textContent = papersResult.pageCount;
 
-      if (schemesResult) {
-        if (downloadSchemesLink.dataset.url) URL.revokeObjectURL(downloadSchemesLink.dataset.url);
-        const schemesUrl = URL.createObjectURL(schemesResult.blob);
-        downloadSchemesLink.href = schemesUrl;
-        downloadSchemesLink.download = filterStr
-          ? `topical-mark-schemes-${slug(filterStr)}.pdf`
-          : 'topical-mark-schemes.pdf';
-        downloadSchemesLink.dataset.url = schemesUrl;
-        resultSchemeCount.textContent = schemesResult.pageCount;
-        resultSchemesRow.style.display = '';
-      } else {
-        resultSchemesRow.style.display = 'none';
-      }
-
       const topicSummary = `${papersResult.topicCount} topic${papersResult.topicCount === 1 ? '' : 's'}`;
       const skipNote = papersResult.skippedCount > 0
-        ? ` · ${papersResult.skippedCount} cover/blank skipped`
+        ? ` · ${papersResult.skippedCount} blank/cover skipped`
         : '';
-      setStatus(`Done — ${topicSummary} · ${papersResult.pageCount} pages${skipNote}`);
+      const irrelNote = (papersResult.irrelevantFiles && papersResult.irrelevantFiles.length > 0)
+        ? ` · ${papersResult.irrelevantFiles.length} non-paper file${papersResult.irrelevantFiles.length === 1 ? '' : 's'} ignored`
+        : '';
+      setStatus(`Done — ${topicSummary} · ${papersResult.pageCount} pages${skipNote}${irrelNote}`);
       ucResult.classList.add('active');
+
+      // Render the green topic list (Topic 1: ... / Topic 2: ...)
+      ucTopicsList.innerHTML = '';
+      for (const t of papersResult.topics) {
+        const li = document.createElement('li');
+        const name = document.createElement('span');
+        name.className = 'topic-name';
+        name.textContent = t.name;
+        const cnt = document.createElement('span');
+        cnt.className = 'topic-count';
+        cnt.textContent = `${t.count} page${t.count === 1 ? '' : 's'}`;
+        li.appendChild(name);
+        li.appendChild(cnt);
+        ucTopicsList.appendChild(li);
+      }
+      ucTopics.hidden = false;
 
       setTimeout(() => {
         ucProgress.classList.remove('active');
@@ -2023,10 +2291,6 @@ If a page genuinely contains questions from multiple topics, pick the dominant o
       btnSort.querySelector('.btn-sort-label').textContent = 'Sort into topics';
     }
   });
-
-  function slug(s) {
-    return s.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '').slice(0, 40);
-  }
 
   // ===== Reveal on scroll =====
   const observer = new IntersectionObserver((entries) => {
